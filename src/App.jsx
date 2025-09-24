@@ -5,6 +5,7 @@ import Home from './pages/home/Home'
 import CourseDetail from './pages/course/CourseDetail'
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Auth from './pages/auth/Auth'
+import Checkout from './pages/Checkout'
 
 function App() {
 
@@ -15,6 +16,7 @@ function App() {
       <Route path="/auth/" element={<Auth />} />
       <Route path="/courses" element={<Course />} />
       <Route path="/courses/:id" element={<CourseDetail />} />
+      <Route path="/checkout" element={<Checkout />} />
 
     </Routes>
   )
