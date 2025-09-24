@@ -3,6 +3,7 @@ import './App.css'
 import Course from './pages/course/Course'
 import Home from './pages/home/Home'
 import CourseDetail from './pages/course/CourseDetail'
+import "@fortawesome/fontawesome-free/css/all.min.css";
 
 function App() {
 

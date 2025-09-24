@@ -11,7 +11,7 @@ export default defineConfig({
           primary: "#4F46E5",   
           dark: "#3730a3",      
           light: "#a5b4fc",     
-          text:"#475569",
+          textColor:"#475569",
         },
     },
   },
