@@ -10,12 +10,13 @@ function App() {
 
   return (
     <Routes>
-        {/* <Route index element={<StepOne />} /> */}
-        <Route path="/" element={<Home />} />
-        <Route path="/auth/" element={<Auth />} />
-        <Route path="/courses" element={<Course />} />
-        <Route path="/courses/:id" element={<CourseDetail />} />
-      </Routes>
+      {/* <Route index element={<StepOne />} /> */}
+      <Route path="/" element={<Home />} />
+      <Route path="/auth/" element={<Auth />} />
+      <Route path="/courses" element={<Course />} />
+      <Route path="/courses/:id" element={<CourseDetail />} />
+
+    </Routes>
   )
 }
 
