@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import CourseCard from "../../conponents/CourseCard";
+import InstructorCard from "../../conponents/InstructorCard";
 
 // NOTE: This component assumes Tailwind CSS is available in your project.
 // Drop it into a Vite/CRA/Next.js app with Tailwind configured.
@@ -143,7 +144,13 @@ function TagButton({ label }) {
         xmlns="http://www.w3.org/2000/svg"
         className="opacity-70"
       >
-        <path d="M7 10l5 5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path
+          d="M7 10l5 5 5-5"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       </svg>
     </button>
   );
@@ -176,7 +183,14 @@ function SearchBar({ value, onChange, onSubmit }) {
 }
 
 function Filters() {
-  const items = ["Subject", "Partner", "Program", "Language", "Alailability", "Learning Type"];
+  const items = [
+    "Subject",
+    "Partner",
+    "Program",
+    "Language",
+    "Alailability",
+    "Learning Type",
+  ];
   return (
     <div className="mt-4 flex flex-wrap items-center gap-3">
       {items.map((i) => (
@@ -185,6 +199,29 @@ function Filters() {
     </div>
   );
 }
+const instructors = [
+  {
+    id: 1,
+    name: "Jane Cooper",
+    image:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=800&auto=format&fit=crop",
+    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+  },
+  {
+    id: 2,
+    name: "Adam",
+    image:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=800&auto=format&fit=crop",
+    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+  },
+  {
+    id: 3,
+    name: "Tomara",
+    image:
+      "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800&auto=format&fit=crop",
+    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+  },
+];
 
 export default function Search() {
   const [query, setQuery] = useState("");
@@ -193,12 +230,15 @@ export default function Search() {
     if (!query) return coursesSeed;
     const q = query.toLowerCase();
     return coursesSeed.filter(
-      (c) => c.title.toLowerCase().includes(q) || c.category.toLowerCase().includes(q) || c.author.toLowerCase().includes(q)
+      (c) =>
+        c.title.toLowerCase().includes(q) ||
+        c.category.toLowerCase().includes(q) ||
+        c.author.toLowerCase().includes(q)
     );
   }, [query]);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 ">
       {/* Hero / Search */}
       <div
         className="relative h-48 w-full overflow-hidden bg-slate-200"
@@ -225,6 +265,22 @@ export default function Search() {
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map((c) => (
             <CourseCard key={c.id} c={c} />
+          ))}
+        </div>
+      </div>
+      {/* Instructors */}
+      <div className="bg-[#ebf5ff] mx-auto  px-14 pt-6 pb-24">
+        <div className="mb-10 flex items-center justify-between">
+          <h2 className="text-2xl font-semibold text-slate-900">
+            Classes taught by real creators
+          </h2>
+          <button className="text-sm font-medium text-slate-700 hover:text-slate-900">
+            See all
+          </button>
+        </div>
+        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-3">
+          {[...instructors, ...instructors].map((i, idx) => (
+            <InstructorCard key={`${i.id}-${idx}`} i={i} />
           ))}
         </div>
       </div>

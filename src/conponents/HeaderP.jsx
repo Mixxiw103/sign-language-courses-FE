@@ -39,7 +39,7 @@ export default function Header() {
 
                     {/* Dropdown */}
                     {isOpen && (
-                        <div className="absolute top-12 right-0 w-40 bg-white shadow-md rounded-lg">
+                        <div className="absolute z-10 top-12 right-0 w-40 bg-white shadow-md rounded-lg">
                             <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">Trang cá nhân</Link>
                             <Link to="/settings" className="block px-4 py-2 hover:bg-gray-100">Cài đặt</Link>
                             <button className="w-full text-left px-4 py-2 hover:bg-gray-100">Đăng xuất</button>
