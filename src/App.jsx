@@ -6,6 +6,7 @@ import CourseDetail from './pages/course/CourseDetail'
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Auth from './pages/auth/Auth'
 import Checkout from './pages/Checkout'
+import Search from './pages/home/Search'
 
 function App() {
 
@@ -13,6 +14,7 @@ function App() {
     <Routes>
       {/* <Route index element={<StepOne />} /> */}
       <Route path="/" element={<Home />} />
+      <Route path="/search" element={<Search />} />
       <Route path="/auth/" element={<Auth />} />
       <Route path="/courses" element={<Course />} />
       <Route path="/courses/:id" element={<CourseDetail />} />
