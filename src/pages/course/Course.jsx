@@ -1,12 +1,17 @@
 import { useState } from "react";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  BookOpen,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
+import CourseCard from "../../conponents/CourseCard";
 import Header from "../../conponents/HeaderP";
+import {
+  PenTool,
+  Monitor,
+  Database,
+  Briefcase,
+  BarChart,
+  Camera,
+  Film,
+} from "lucide-react";
 
 export default function CoursePage() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -17,89 +22,169 @@ export default function CoursePage() {
       id: 1,
       title: "AWS Chứng chỉ Kiến trúc sư Giải pháp",
       teacher: "Lina",
-      img: "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?q=80&w=1600&auto=format&fit=crop",
+      img: "https://picsum.photos/400/200?random=1",
       progress: "Bài học 5/7",
     },
     {
       id: 2,
-      title: "AWS Chứng chỉ Kiến trúc sư Giải pháp",
-      teacher: "Lina",
-      img: "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?q=80&w=1600&auto=format&fit=crop",
-      progress: "Bài học 5/7",
+      title: "ReactJS Cơ bản",
+      teacher: "David",
+      img: "https://picsum.photos/400/200?random=2",
+      progress: "Bài học 3/12",
     },
     {
       id: 3,
-      title: "AWS Chứng chỉ Kiến trúc sư Giải pháp",
-      teacher: "Lina",
-      img: "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?q=80&w=1600&auto=format&fit=crop",
-      progress: "Bài học 5/7",
+      title: "Python cho người mới bắt đầu",
+      teacher: "Sophia",
+      img: "https://picsum.photos/400/200?random=3",
+      progress: "Bài học 7/10",
     },
   ];
 
   const categories = [
-    { id: 1, name: "Thiết kế", icon: "✏️" },
-    { id: 2, name: "Phát triển", icon: "💻" },
-    { id: 3, name: "Công nghệ", icon: "📘" },
-    { id: 4, name: "Kinh doanh", icon: "📂" },
-    { id: 5, name: "Marketing", icon: "📊" },
-    { id: 6, name: "Nhiếp ảnh", icon: "📷" },
-    { id: 7, name: "Diễn xuất", icon: "🎭" },
-    { id: 8, name: "Quản lý", icon: "📁" },
+    { id: 1, name: "Design", icon: PenTool, color: "bg-teal-100 text-teal-600" },
+    { id: 2, name: "Development", icon: Monitor, color: "bg-indigo-100 text-indigo-600" },
+    { id: 3, name: "Technology", icon: Database, color: "bg-blue-100 text-blue-600" },
+    { id: 4, name: "Business", icon: Briefcase, color: "bg-emerald-100 text-emerald-600" },
+    { id: 5, name: "Marketing", icon: BarChart, color: "bg-amber-100 text-amber-600" },
+    { id: 6, name: "Photography", icon: Camera, color: "bg-rose-100 text-rose-600" },
+    { id: 7, name: "Acting", icon: Film, color: "bg-gray-100 text-gray-600" },
+    { id: 8, name: "Management", icon: BookOpen, color: "bg-green-100 text-green-600" },
   ];
 
   const courses = [
     {
       id: 1,
-      title: "AWS Chứng chỉ Kiến trúc sư Giải pháp",
-      teacher: "Lina",
-      duration: "20 giờ",
-      lessons: "20 bài học",
-      price: "$80",
-      oldPrice: "$200",
-      img: "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?q=80&w=1600&auto=format&fit=crop",
+      title: "AWS Certified solutions Architect",
+      category: "Design",
+      duration: "3 Month",
+      image:
+        "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200&auto=format&fit=crop",
+      author: "Lina",
+      avatar:
+        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop",
+      oldPrice: 100,
+      price: 80,
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
     },
     {
       id: 2,
-      title: "AWS Chứng chỉ Kiến trúc sư Giải pháp",
-      teacher: "Lina",
-      duration: "18 giờ",
-      lessons: "15 bài học",
-      price: "$80",
-      oldPrice: "$200",
-      img: "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?q=80&w=1600&auto=format&fit=crop",
+      title: "AWS Certified solutions Architect",
+      category: "Design",
+      duration: "3 Month",
+      image:
+        "https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?q=80&w=1200&auto=format&fit=crop",
+      author: "Lina",
+      avatar:
+        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop",
+      oldPrice: 100,
+      price: 80,
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
     },
     {
       id: 3,
-      title: "AWS Chứng chỉ Kiến trúc sư Giải pháp",
-      teacher: "Lina",
-      duration: "25 giờ",
-      lessons: "30 bài học",
-      price: "$80",
-      oldPrice: "$200",
-      img: "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?q=80&w=1600&auto=format&fit=crop",
+      title: "AWS Certified solutions Architect",
+      category: "Design",
+      duration: "3 Month",
+      image:
+        "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1200&auto=format&fit=crop",
+      author: "Lina",
+      avatar:
+        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop",
+      oldPrice: 100,
+      price: 80,
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
     },
     {
       id: 4,
-      title: "AWS Chứng chỉ Kiến trúc sư Giải pháp",
-      teacher: "Lina",
-      duration: "15 giờ",
-      lessons: "12 bài học",
-      price: "$80",
-      oldPrice: "$200",
-      img: "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?q=80&w=1600&auto=format&fit=crop",
+      title: "AWS Certified solutions Architect",
+      category: "Design",
+      duration: "3 Month",
+      image:
+        "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1200&auto=format&fit=crop",
+      author: "Lina",
+      avatar:
+        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop",
+      oldPrice: 100,
+      price: 80,
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+    },
+    {
+      id: 5,
+      title: "AWS Certified solutions Architect",
+      category: "Design",
+      duration: "3 Month",
+      image:
+        "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop",
+      author: "Lina",
+      avatar:
+        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop",
+      oldPrice: 100,
+      price: 80,
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+    },
+    {
+      id: 6,
+      title: "AWS Certified solutions Architect",
+      category: "Design",
+      duration: "3 Month",
+      image:
+        "https://images.unsplash.com/photo-1514790193030-c89d266d5a9d?q=80&w=1200&auto=format&fit=crop",
+      author: "Lina",
+      avatar:
+        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop",
+      oldPrice: 100,
+      price: 80,
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+    },
+    {
+      id: 7,
+      title: "AWS Certified solutions Architect",
+      category: "Design",
+      duration: "3 Month",
+      image:
+        "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop",
+      author: "Lina",
+      avatar:
+        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop",
+      oldPrice: 100,
+      price: 80,
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+    },
+    {
+      id: 8,
+      title: "AWS Certified solutions Architect",
+      category: "Design",
+      duration: "3 Month",
+      image:
+        "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop",
+      author: "Lina",
+      avatar:
+        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop",
+      oldPrice: 100,
+      price: 80,
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
     },
   ];
 
-  const handlePrev = () => {
-    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : lessons.length - 1));
-  };
+  // const handlePrev = () => {
+  //   setCurrentIndex((prev) => (prev > 0 ? prev - 1 : lessons.length - 1));
+  // };
 
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev < lessons.length - 1 ? prev + 1 : 0));
-  };
+  // const handleNext = () => {
+  //   setCurrentIndex((prev) => (prev < lessons.length - 1 ? prev + 1 : 0));
+  // };
 
   return (
-    <div className="w-full min-h-screen bg-gray-50">
+    <div className="w-full min-h-screen bg-gray-50 text-left">
       {/* ===== Header ===== */}
       <Header />
 
@@ -122,13 +207,17 @@ export default function CoursePage() {
                 className={`rounded-xl bg-white shadow-md overflow-hidden transition ${index === currentIndex ? "block" : "hidden md:block"
                   }`}
               >
-                <img src={lesson.img} alt={lesson.title} className="w-full h-40 object-cover" />
+                <img
+                  src={lesson.img}
+                  alt={lesson.title}
+                  className="w-full h-40 object-cover"
+                />
                 <div className="p-4">
                   <h3 className="font-semibold text-gray-700">{lesson.title}</h3>
                   <div className="flex items-center mt-2">
                     <img
                       src="https://i.pravatar.cc/40?img=2"
-                      alt={lesson.teacher}
+                      alt={lesson.avatar}
                       className="w-6 h-6 rounded-full mr-2"
                     />
                     <span className="text-sm text-gray-600">{lesson.teacher}</span>
@@ -142,7 +231,7 @@ export default function CoursePage() {
                 </div>
               </div>
             ))}
-            <button
+            {/* <button
               onClick={handlePrev}
               className="absolute left-0 top-1/2 -translate-y-1/2 bg-white p-2 shadow-md rounded-full hidden md:block"
             >
@@ -153,13 +242,13 @@ export default function CoursePage() {
               className="absolute right-0 top-1/2 -translate-y-1/2 bg-white p-2 shadow-md rounded-full hidden md:block"
             >
               <ChevronRight className="w-5 h-5" />
-            </button>
+            </button> */}
           </div>
         </div>
       </section>
 
       {/* ===== Danh mục khóa học ===== */}
-      <section className="py-12 px-6">
+      <section className="py-8 px-6">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-xl font-semibold text-gray-800 mb-8">
             Chọn khóa học yêu thích từ danh mục nổi bật
@@ -170,109 +259,57 @@ export default function CoursePage() {
                 key={cat.id}
                 className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center text-center hover:shadow-lg transition"
               >
-                <div className="text-4xl mb-4">{cat.icon}</div>
+                <div className={`p-3 rounded-lg ${cat.color} mb-4`}>
+                  <cat.icon className="w-6 h-6" />
+                </div>
                 <h3 className="font-semibold text-gray-700 mb-2">{cat.name}</h3>
                 <p className="text-sm text-gray-500">
-                  Đây là mô tả ngắn cho danh mục {cat.name}.
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                 </p>
               </div>
             ))}
           </div>
+
         </div>
       </section>
 
-      {/* ===== Gợi ý cho bạn ===== */}
-      <section className="bg-blue-50 py-12 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-800">Gợi ý cho bạn</h2>
-            <button className="text-sm text-black hover:underline">Xem tất cả</button>
+      {/* ===== Các section khóa học ===== */}
+      {[
+        { title: "Gợi ý cho bạn", bg: "bg-blue-50" },
+        { title: "Lựa chọn khóa học của bạn", bg: "bg-white" },
+        { title: "Khóa học về phát triển cá nhân", bg: "bg-white" },
+        { title: "Học viên đang xem", bg: "bg-blue-50" },
+      ].map((section, idx) => (
+        <section key={idx} className={`${section.bg} py-12 px-6`}>
+          <div className="max-w-6xl mx-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-gray-800">
+                {section.title}
+              </h2>
+              <button className="text-sm text-black hover:underline">
+                Xem tất cả
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+              {courses.map((course) => (
+                <CourseCard key={course.id} c={course} />
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            {courses.map((course) => (
-              <div key={course.id} className="rounded-xl bg-white shadow-md overflow-hidden">
-                <img src={course.img} alt={course.title} className="w-full h-40 object-cover" />
-                <div className="p-4">
-                  <div className="flex items-center text-gray-500 text-xs space-x-3 mb-2">
-                    <span className="flex items-center">
-                      <Clock className="w-4 h-4 mr-1" /> {course.duration}
-                    </span>
-                    <span className="flex items-center">
-                      <BookOpen className="w-4 h-4 mr-1" /> {course.lessons}
-                    </span>
-                  </div>
-                  <h3 className="font-semibold text-gray-700 line-clamp-2">{course.title}</h3>
-                  <p className="text-sm text-gray-500 mt-2">Đây là mô tả ngắn gọn cho khóa học.</p>
-                  <div className="flex items-center mt-3">
-                    <img
-                      src="https://i.pravatar.cc/40?img=3"
-                      alt={course.teacher}
-                      className="w-6 h-6 rounded-full mr-2"
-                    />
-                    <span className="text-sm text-gray-600">{course.teacher}</span>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between">
-                    <span className="text-gray-400 line-through text-sm">{course.oldPrice}</span>
-                    <span className="text-black font-bold">{course.price}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      ))}
 
-      {/* ===== Lựa chọn khóa học của bạn ===== */}
-      <section className="py-12 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-800">Lựa chọn khóa học của bạn</h2>
-            <button className="text-sm text-black hover:underline">Xem tất cả</button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            {courses.map((course) => (
-              <div key={course.id} className="rounded-xl bg-white shadow-md overflow-hidden">
-                <img src={course.img} alt={course.title} className="w-full h-40 object-cover" />
-                <div className="p-4">
-                  <div className="flex items-center text-gray-500 text-xs space-x-3 mb-2">
-                    <span className="flex items-center">
-                      <Clock className="w-4 h-4 mr-1" /> {course.duration}
-                    </span>
-                    <span className="flex items-center">
-                      <BookOpen className="w-4 h-4 mr-1" /> {course.lessons}
-                    </span>
-                  </div>
-                  <h3 className="font-semibold text-gray-700 line-clamp-2">{course.title}</h3>
-                  <p className="text-sm text-gray-500 mt-2">Đây là mô tả ngắn gọn cho khóa học.</p>
-                  <div className="flex items-center mt-3">
-                    <img
-                      src="https://i.pravatar.cc/40?img=4"
-                      alt={course.teacher}
-                      className="w-6 h-6 rounded-full mr-2"
-                    />
-                    <span className="text-sm text-gray-600">{course.teacher}</span>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between">
-                    <span className="text-gray-400 line-through text-sm">{course.oldPrice}</span>
-                    <span className="text-black font-bold">{course.price}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
       {/* ===== Banner coaching online ===== */}
       <section className="py-12 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="bg-neutral-900 text-center text-white rounded-xl py-12 px-6">
+          <div className="bg-neutral-900 text-left text-white rounded-xl py-12 px-6">
             <h2 className="text-2xl font-bold mb-4">
               Bài học huấn luyện trực tuyến cho việc học từ xa
             </h2>
-            <p className="max-w-2xl mx-auto text-gray-200 mb-6">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-              tempor. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-              tempor.
+            <p className="max-w-2xl text-gray-200 mb-6">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor. Lorem ipsum dolor sit amet, consectetur adipiscing
+              elit, sed do eiusmod tempor.
             </p>
             <button className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg font-medium">
               Bắt đầu học ngay
@@ -280,97 +317,6 @@ export default function CoursePage() {
           </div>
         </div>
       </section>
-
-      {/* ===== Khóa học phát triển cá nhân ===== */}
-      <section className="py-12 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-800">
-              Khóa học về phát triển cá nhân
-            </h2>
-            <button className="text-sm text-black hover:underline">Xem tất cả</button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            {courses.map((course) => (
-              <div key={course.id} className="rounded-xl bg-white shadow-md overflow-hidden">
-                <img src={course.img} alt={course.title} className="w-full h-40 object-cover" />
-                <div className="p-4">
-                  <div className="flex items-center text-gray-500 text-xs space-x-3 mb-2">
-                    <span className="flex items-center">
-                      <Clock className="w-4 h-4 mr-1" /> {course.duration}
-                    </span>
-                    <span className="flex items-center">
-                      <BookOpen className="w-4 h-4 mr-1" /> {course.lessons}
-                    </span>
-                  </div>
-                  <h3 className="font-semibold text-gray-700 line-clamp-2">{course.title}</h3>
-                  <p className="text-sm text-gray-500 mt-2">
-                    Đây là mô tả ngắn gọn cho khóa học này.
-                  </p>
-                  <div className="flex items-center mt-3">
-                    <img
-                      src="https://i.pravatar.cc/40?img=5"
-                      alt={course.teacher}
-                      className="w-6 h-6 rounded-full mr-2"
-                    />
-                    <span className="text-sm text-gray-600">{course.teacher}</span>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between">
-                    <span className="text-gray-400 line-through text-sm">{course.oldPrice}</span>
-                    <span className="text-black font-bold">{course.price}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== Học viên đang xem ===== */}
-      <section className="bg-blue-50 py-12 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-800">
-              Học viên đang xem
-            </h2>
-            <button className="text-sm text-black hover:underline">Xem tất cả</button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            {courses.map((course) => (
-              <div key={course.id} className="rounded-xl bg-white shadow-md overflow-hidden">
-                <img src={course.img} alt={course.title} className="w-full h-40 object-cover" />
-                <div className="p-4">
-                  <div className="flex items-center text-gray-500 text-xs space-x-3 mb-2">
-                    <span className="flex items-center">
-                      <Clock className="w-4 h-4 mr-1" /> {course.duration}
-                    </span>
-                    <span className="flex items-center">
-                      <BookOpen className="w-4 h-4 mr-1" /> {course.lessons}
-                    </span>
-                  </div>
-                  <h3 className="font-semibold text-gray-700 line-clamp-2">{course.title}</h3>
-                  <p className="text-sm text-gray-500 mt-2">
-                    Đây là mô tả ngắn gọn cho khóa học này.
-                  </p>
-                  <div className="flex items-center mt-3">
-                    <img
-                      src="https://i.pravatar.cc/40?img=6"
-                      alt={course.teacher}
-                      className="w-6 h-6 rounded-full mr-2"
-                    />
-                    <span className="text-sm text-gray-600">{course.teacher}</span>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between">
-                    <span className="text-gray-400 line-through text-sm">{course.oldPrice}</span>
-                    <span className="text-black font-bold">{course.price}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
     </div>
   );
 }
