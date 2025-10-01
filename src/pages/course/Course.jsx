@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, Clock, BookOpen } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CourseCard from "../../conponents/CourseCard";
 import Header from "../../conponents/HeaderP";
 import {
@@ -12,9 +12,18 @@ import {
   Camera,
   Film,
 } from "lucide-react";
+import { AnimatePresence,motion } from "framer-motion";
+import Search from "./Search";
 
 export default function CoursePage() {
+  const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState("")
   const [currentIndex, setCurrentIndex] = useState(0);
+  const fade = {
+  initial: { opacity: 0, y: 6 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.25 } },
+  exit:    { opacity: 0, y: -6, transition: { duration: 0.2 } },
+};
 
   // Dữ liệu demo
   const lessons = [
@@ -188,8 +197,48 @@ export default function CoursePage() {
       {/* ===== Header ===== */}
       <Header />
 
+      <div 
+  className="my-10 relative mx-auto flex w-full max-w-3xl items-center rounded-full bg-white p-1 pl-4 shadow-xl ring-1 ring-slate-100"
+>
+  <input
+    type="text"
+    placeholder="Search your favourite course"
+    className="h-12 flex-1 rounded-full bg-transparent pl-2 pr-10 text-base text-slate-700 placeholder:text-slate-400 focus:outline-none"
+    value={searchValue}
+    onChange={(e) => setSearchValue(e.target.value)}
+  />
+
+  {/* Dấu X clear input */}
+  {searchValue && (
+    <button
+      type="button"
+      onClick={() => setSearchValue("")}
+      className="absolute right-30 p-2 text-slate-300 cursor-pointer text-sm hover:text-slate-600"
+    >
+      <i className="fas fa-times"></i> {/* hoặc dùng icon lib khác */}
+    </button>
+  )}
+
+  <button
+    className="cursor-pointer mr-1 rounded-full bg-slate-900 px-8 py-3 text-sm font-semibold text-white hover:bg-slate-800"
+    type="submit"
+  >
+    Search
+  </button>
+</div>
+
+
+       <AnimatePresence mode="wait" initial={false}>
+      {searchValue != "" ? <motion.div key="search" {...fade}>
+            {/* nội dung khi có searchValue (ví dụ kết quả tìm kiếm) */}
+            <div className="">
+              <Search></Search>
+            </div>
+          </motion.div>: 
+      <motion.div key="home" {...fade}>
       {/* ===== Bài học tiếp theo ===== */}
       <section className="bg-blue-50 py-10 px-6">
+        
         <div className="max-w-6xl mx-auto">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold text-gray-800">
@@ -249,6 +298,7 @@ export default function CoursePage() {
 
       {/* ===== Danh mục khóa học ===== */}
       <section className="py-8 px-6">
+        
         <div className="max-w-6xl mx-auto">
           <h2 className="text-xl font-semibold text-gray-800 mb-8">
             Chọn khóa học yêu thích từ danh mục nổi bật
@@ -299,6 +349,8 @@ export default function CoursePage() {
         </section>
       ))}
 
+      </motion.div>}
+      </AnimatePresence>
       {/* ===== Banner coaching online ===== */}
       <section className="py-12 px-6">
         <div className="max-w-6xl mx-auto">

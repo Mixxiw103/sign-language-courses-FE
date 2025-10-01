@@ -3,9 +3,20 @@
 
 /* 2) Đưa reset vào layer base để không đè utilities */
 @layer base {
-  /* Reset an toàn */
-  *, *::before, *::after { box-sizing: border-box; }
-  * { margin: 0; padding: 0; }
+  *, *::before, *::after {
+    box-sizing: border-box;
+
+    /* Transition mượt cho các thuộc tính nhẹ */
+    transition-property: color, background-color, border-color,
+      text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+  }
 
   /* Đừng ép màu toàn cục ở :root nếu bạn muốn dùng text-*, bg-* của TL */
   /* Nếu cần, chỉ nên set font & smoothing */

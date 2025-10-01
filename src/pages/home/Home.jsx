@@ -27,7 +27,7 @@ export default function Home() {
       <Header />
 
       {/* Nội dung trang */}
-      <main className="max-w-7xl mx-auto flex flex-col items-center px-4">
+      <main className="max-w-7xl mx-auto flex flex-col items-center px-4 mt-3">
         {/* Text and Image Section */}
         <div className="w-full flex flex-row mb-12">
           {/* Text */}
@@ -48,7 +48,7 @@ export default function Home() {
 
             <div className="flex space-x-4">
               <Link
-                to="/register"
+                to="/auth"
                 className="px-4 py-2 rounded-lg bg-sky-300 bg-opacity-50 text-white hover:bg-cyan-600"
               >
                 Khám phá ngay

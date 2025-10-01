@@ -239,21 +239,7 @@ export default function Search() {
 
   return (
     <div className="min-h-screen bg-slate-50 ">
-      {/* Hero / Search */}
-      <div
-        className="relative h-48 w-full overflow-hidden bg-slate-200"
-        style={{
-          backgroundImage:
-            "url(https://images.unsplash.com/photo-1513258496099-48168024aec0?q=80&w=1600&auto=format&fit=crop)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="absolute inset-0 bg-black/30"></div>
-        <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center justify-center px-6">
-          <SearchBar value={query} onChange={setQuery} />
-        </div>
-      </div>
+      
 
       {/* Filters */}
       <div className="mx-auto max-w-7xl px-6">
