@@ -12,6 +12,11 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.0.1",
+    "@tiptap/extension-link": "^3.6.2",
+    "@tiptap/extension-placeholder": "^3.6.2",
+    "@tiptap/extension-underline": "^3.6.2",
+    "@tiptap/react": "^3.6.2",
+    "@tiptap/starter-kit": "^3.6.2",
     "framer-motion": "^12.23.22",
     "lucide-react": "^0.544.0",
     "react": "^19.1.1",

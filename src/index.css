@@ -3,6 +3,9 @@
 
 /* 2) Đưa reset vào layer base để không đè utilities */
 @layer base {
+  .tiptap ul { list-style: disc; padding-left: 1.25rem; }
+  .tiptap ol { list-style: decimal; padding-left: 1.25rem; }
+  .tiptap li { margin: 0.25rem 0; }
   *, *::before, *::after {
     box-sizing: border-box;
 
@@ -36,6 +39,19 @@
 
   /* Headings không ép size để utility text-* hoạt động đúng */
   h1,h2,h3,h4,h5,h6 { font-size: inherit; font-weight: inherit; }
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  color: #9ca3af; /* slate-400 */
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+.tiptap.ProseMirror:focus,
+.tiptap.ProseMirror:focus-visible {
+  outline: none !important;
+  box-shadow: none !important; /* đề phòng UA gán shadow khi focus */
 }
 
 /* Nếu vẫn muốn hỗ trợ light mode theo prefers-color-scheme, 

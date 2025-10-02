@@ -5,7 +5,7 @@ import {
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
-export default function DashboardLayout() {
+export default function DashboardAdminLayout() {
   const location = useLocation();
 
   return (
@@ -25,13 +25,13 @@ export default function DashboardLayout() {
           {/* Nav */}
           <nav className="flex-1 p-4 space-y-1">
             {[
-              { to: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
-              { to: "/dashboard/orders", label: "Orders", icon: <ShoppingCart className="h-5 w-5" /> },
-              { to: "/dashboard/products", label: "Products", icon: <Package className="h-5 w-5" /> },
-              { to: "/dashboard/customers", label: "Customers", icon: <Users className="h-5 w-5" /> },
-              { to: "/dashboard/courses", label: "Courses", icon: <GraduationCap className="h-5 w-5" /> },
-              { to: "/dashboard/reports", label: "Reports", icon: <BarChart3 className="h-5 w-5" /> },
-              { to: "/dashboard/settings", label: "Settings", icon: <Settings className="h-5 w-5" /> },
+              { to: "/admin", label: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
+              { to: "/admin/orders", label: "Orders", icon: <ShoppingCart className="h-5 w-5" /> },
+              { to: "/admin/products", label: "Products", icon: <Package className="h-5 w-5" /> },
+              { to: "/admin/customers", label: "Customers", icon: <Users className="h-5 w-5" /> },
+              { to: "/admin/courses", label: "Courses", icon: <GraduationCap className="h-5 w-5" /> },
+              { to: "/admin/reports", label: "Reports", icon: <BarChart3 className="h-5 w-5" /> },
+              { to: "/admin/settings", label: "Settings", icon: <Settings className="h-5 w-5" /> },
             ].map((item) => (
               <NavLink
                 key={item.label}
