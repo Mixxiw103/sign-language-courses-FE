@@ -24,6 +24,7 @@ import DashboardTeacherMyCourse from "./pages/teacher/DashboardTeacherMyCourse";
 import DashboardTeacherMessage from "./pages/teacher/DashboardTeacherMessage";
 import DashboardTeacherSetting from "./pages/teacher/DashboardTeacherSetting";
 import DashboardTeacherHome from "./pages/teacher/DashboardTeacherHome";
+import CourseView from "./pages/course/CourseView";
 
 function App() {
   const location = useLocation();
@@ -34,6 +35,7 @@ function App() {
         <Route path="/" element={<Page><Home /></Page>} />
         <Route path="/auth" element={<Page><Auth /></Page>} />
         <Route path="/courses" element={<Page><Course /></Page>} />
+        <Route path="/course-view" element={<Page><CourseView /></Page>} />
         <Route path="/courses/:id" element={<Page><CourseDetail /></Page>} />
         <Route path="/checkout" element={<Page><Checkout /></Page>} />
 

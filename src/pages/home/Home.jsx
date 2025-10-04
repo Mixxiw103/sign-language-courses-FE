@@ -342,6 +342,106 @@ export default function Home() {
             <CourseCard c={sampleCourse} />
           </div>
         </section>
+
+        {/* Teacher Section */}
+        <section className="flex flex-col items-center justify-center min-h-screen p-6 text-center mb-12 w-full">
+          <div className="text-center">
+            <h1 className="text-5xl font-bold text-gray-800 mb-4">Bạn là người Điếc</h1>
+            <p className="text-lg text-gray-600 mb-6">
+              Hãy trở thành giáo viên dạy NNKH của trung tâm chúng mình, chỉ cần tạo 1 khóa học mới là bạn có thể bắt đầu hành trình làm giáo viên.
+            </p>
+            <button className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition duration-300">
+              Đăng kí ngay
+            </button>
+          </div>
+          <div className="flex items-center justify-between w-full mt-12">
+            <div className="w-2/5">
+              <img
+                src="https://cloudassess.com/wp-content/uploads/2025/04/Instructor-Happily-Working-on-Costs-and-Logistics.jpg.webp"
+                alt="Eduguard Interface"
+                className="rounded-lg shadow-lg"
+              />
+            </div>
+            <div className="w-3/5 pl-12">
+              <h2 className="text-3xl font-bold text-gray-800 mb-4">Tại sao bạn nên đăng kí làm giáo viên trung tâm</h2>
+              <ul className="list-none text-gray-600 space-y-4">
+                <li className="flex items-center">
+                  <span className="text-green-500 mr-2">✔</span> Đáp ứng nhu cầu dạy học của bạn.
+                </li>
+                <li className="flex items-center">
+                  <span className="text-green-500 mr-2">✔</span> Tự quản lí khóa học của bạn.
+                </li>
+                <li className="flex items-center">
+                  <span className="text-green-500 mr-2">✔</span> Trò chuyện với học viên nếu cần.
+                </li>
+                <li className="flex items-center">
+                  <span className="text-green-500 mr-2">✔</span> Kiếm thêm thu nhập.
+                </li>
+              </ul>              
+            </div>
+          </div>
+          <div className="text-center my-12">
+            <h1 className="text-4xl font-bold text-gray-800 mb-4">Làm thế nào để trở thành giáo viên?</h1>
+            <div className="flex justify-around w-full max-w-4xl">
+              <div className="bg-white p-6 rounded-lg shadow-md w-1/4">
+                <p className="text-gray-600 mb-2">1. Đăng kí làm giáo viên</p>
+                <p className="text-sm text-gray-500">Bạn hãy đăng kí tài khoản giáo viên trên hệ thống</p>
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow-md w-1/4">
+                <p className="text-gray-600 mb-2">2. Tạo cho mình 1 profile độc đáo</p>
+                <p className="text-sm text-gray-500">Bạn có thể giới thiệu bản thân mình</p>
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow-md w-1/4">
+                <p className="text-gray-600 mb-2">3. Tạo 1 khóa học mới</p>
+                <p className="text-sm text-gray-500">THiết kế khóa học của bạn và tải tài liệu lên mạng</p>
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow-md w-1/4">
+                <p className="text-gray-600 mb-2">4. Bắt đầu kiếm tiền</p>
+                <p className="text-sm text-gray-500">Sau khi học viên mua khóa học của bạn, bạn có thể kiếm tiền</p>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center justify-between w-full max-w-5xl mb-12">
+            <div className="w-1/2 pr-6">
+              <h2 className="text-3xl font-bold text-gray-800 mb-4">Quy định khi làm giáo viên</h2>
+              <ul className="list-disc list-inside text-gray-600 space-y-2">
+                <li>Quy định 1.</li>
+                <li>Quy định 2.</li>
+                <li>Quy định 3.</li>
+                <li>Quy định 4.</li>
+              </ul>
+            </div>
+            <div className="w-1/2">
+              <img
+                src="https://cloudassess.com/wp-content/uploads/2025/04/Instructor-Happily-Working-on-Costs-and-Logistics.jpg.webp"
+                alt="Instructor Working"
+                className="rounded-lg shadow-lg"
+              />
+            </div>
+          </div>
+          <div className="w-full bg-orange-50 p-12 text-center">
+            <h2 className="text-3xl font-bold text-gray-800 mb-6">Bạn có vấn đề cần giải đáp</h2>
+            <p className="text-gray-600 mb-4">Đừng lo, chúng tôi có đội ngũ kĩ thuật viên để hỗ trợ bạn, liên lạc với chúng tôi ngay khi bạn có vấn đề như:</p>
+            <ul className="list-disc list-inside text-gray-600 space-y-2 text-left mx-auto max-w-md">
+              <li>Gặp khó khăn trong việc đăng kí làm giáo viên/học viên</li>
+              <li>Lỗi kĩ thuật (Không tải được tài liệu, lỗi,...)</li>
+              <li>Và tất cả các vấn đề khác phát sinh...</li>
+            </ul>
+            <p className="text-gray-600 mt-4">📧 <a href="mailto:help@eduagent.com" className="text-orange-500">Email@email.com</a></p>
+            <div className="flex justify-center mt-6">
+              <img
+                src="https://via.placeholder.com/300x200"
+                alt="Support Team"
+                className="rounded-lg shadow-lg mr-4"
+              />
+              <img
+                src="https://blog.hubspot.com/service/best-help-desk-softwarehttps://53.fs1.hubspotusercontent-na1.net/hubfs/53/best-help-desk-software.jpg"
+                alt="Support Desk"
+                className="rounded-lg shadow-lg"
+              />
+            </div>
+          </div>
+        </section>
       </main>
       <Footer></Footer>
     </div>
