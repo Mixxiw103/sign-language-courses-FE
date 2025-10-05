@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
-import { Star, Users } from "lucide-react";
-
+import { Star, Users, GraduationCap } from "lucide-react";
 const courses = [
   {
     id: 1,
@@ -60,11 +59,14 @@ export default function DashboardCourse() {
 
   return (
     <div className="p-6 bg-[#FFF7ED] min-h-screen">
-      <div className="max-w-6xl mx-auto bg-white rounded-xl shadow p-6">
+      <div className="max-w-full mx-auto bg-white rounded-xl shadow ">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h2 className="text-2xl font-semibold">Courses</h2>
+            <div className="flex items-center gap-2 mb-1">
+              <GraduationCap />
+              <h2 className="text-2xl font-semibold">Courses</h2>
+            </div>
             <p className="text-gray-500">
               Manage your e-learning courses and content
             </p>
