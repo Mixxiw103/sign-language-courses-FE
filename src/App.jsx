@@ -7,7 +7,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import Auth from "./pages/auth/Auth";
 import Checkout from "./pages/Checkout";
 import { AnimatePresence } from "framer-motion";
-import Page from "./conponents/Page";
+import Page from "./components/Page";
 import DashboardHome from "./pages/admin/DashboardHome";
 import DashboardOrder from "./pages/admin/DashboardOrder";
 import DashboardProduct from "./pages/admin/DashboardProduct";
@@ -25,6 +25,8 @@ import DashboardTeacherMessage from "./pages/teacher/DashboardTeacherMessage";
 import DashboardTeacherSetting from "./pages/teacher/DashboardTeacherSetting";
 import DashboardTeacherHome from "./pages/teacher/DashboardTeacherHome";
 import CourseView from "./pages/course/CourseView";
+import MessagesPage from "./pages/chat/MessageChat";
+import VideoCallPage from "./pages/chat/videocall";
 
 function App() {
   const location = useLocation();
@@ -38,10 +40,12 @@ function App() {
         <Route path="/course-view" element={<Page><CourseView /></Page>} />
         <Route path="/courses/:id" element={<Page><CourseDetail /></Page>} />
         <Route path="/checkout" element={<Page><Checkout /></Page>} />
+        <Route path="/message" element={<Page><MessagesPage /></Page>} />
+        <Route path="/video-call" element={<Page><VideoCallPage /></Page>} />
 
         {/* Dashboard Admin*/}
         <Route path="/admin" element={<DashboardAdminLayout />}>
-          <Route index element={<DashboardHome />} />        
+          <Route index element={<DashboardHome />} />
           <Route path="home" element={<DashboardHome />} />
           <Route path="orders" element={<DashboardOrder />} />
           <Route path="products" element={<DashboardProduct />} />

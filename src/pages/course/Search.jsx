@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
-import CourseCard from "../../conponents/CourseCard";
-import InstructorCard from "../../conponents/InstructorCard";
+import CourseCard from "../../components/CourseCard";
+import InstructorCard from "../../components/InstructorCard";
 
 // NOTE: This component assumes Tailwind CSS is available in your project.
 // Drop it into a Vite/CRA/Next.js app with Tailwind configured.

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import CourseCard from "../conponents/CourseCard";
+import CourseCard from "../components/CourseCard";
 export default function CheckoutPage() {
     const [formData, setFormData] = useState({
         name: "",

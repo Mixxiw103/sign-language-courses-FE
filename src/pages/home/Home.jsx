@@ -1,10 +1,10 @@
 import { useState } from "react";
-import Header from "../../conponents/HeaderP";
+import Header from "../../components/HeaderP";
 import { Link } from "react-router-dom";
 import HomeIntroduceImg from "../../assets/Home_introduce.png";
-import CourseCard from "../../conponents/CourseCard";
+import CourseCard from "../../components/CourseCard";
 import { ArrowRight } from "lucide-react";
-import Footer from "../../conponents/Footer";
+import Footer from "../../components/Footer";
 
 export default function Home() {
   const [showVideo, setShowVideo] = useState(false);

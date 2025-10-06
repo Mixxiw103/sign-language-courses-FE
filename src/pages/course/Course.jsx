@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, Clock, BookOpen } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import CourseCard from "../../conponents/CourseCard";
-import Header from "../../conponents/HeaderP";
+import CourseCard from "../../components/CourseCard";
+import Header from "../../components/HeaderP";
 import {
   PenTool,
   Monitor,
