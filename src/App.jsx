@@ -28,6 +28,9 @@ import CourseView from "./pages/course/CourseView";
 import MessagesPage from "./pages/chat/MessageChat";
 import VideoCallPage from "./pages/chat/videocall";
 import DashboardMainLayout from "./layout/DashboardMainLayout";
+import Blog from "./pages/home/Blog";
+import Career from "./pages/home/Career";
+import About from "./pages/home/About";
 
 function App() {
   const location = useLocation();
@@ -56,7 +59,7 @@ function App() {
             path="careers"
             element={
               <Page>
-                <Course />
+                <Career />
               </Page>
             }
           />
@@ -64,7 +67,7 @@ function App() {
             path="blog"
             element={
               <Page>
-                <Course />
+                <Blog />
               </Page>
             }
           />
@@ -72,7 +75,7 @@ function App() {
             path="about"
             element={
               <Page>
-                <Course />
+                <About />
               </Page>
             }
           />
