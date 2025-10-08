@@ -27,6 +27,7 @@ import DashboardTeacherHome from "./pages/teacher/DashboardTeacherHome";
 import CourseView from "./pages/course/CourseView";
 import MessagesPage from "./pages/chat/MessageChat";
 import VideoCallPage from "./pages/chat/videocall";
+import DashboardMainLayout from "./layout/DashboardMainLayout";
 
 function App() {
   const location = useLocation();
@@ -34,14 +35,105 @@ function App() {
   return (
     <AnimatePresence mode="wait" initial={false}>
       <Routes key={location.pathname} location={location}>
-        <Route path="/" element={<Page><Home /></Page>} />
+        <Route path="/" element={<DashboardMainLayout />}>
+          <Route
+            index
+            element={
+              <Page>
+                <Home />
+              </Page>
+            }
+          />
+          <Route
+            path="courses"
+            element={
+              <Page>
+                <Course />
+              </Page>
+            }
+          />
+          <Route
+            path="careers"
+            element={
+              <Page>
+                <Course />
+              </Page>
+            }
+          />
+          <Route
+            path="blog"
+            element={
+              <Page>
+                <Course />
+              </Page>
+            }
+          />
+          <Route
+            path="about"
+            element={
+              <Page>
+                <Course />
+              </Page>
+            }
+          />
+          <Route
+            path="/course-view"
+            element={
+              <Page>
+                <CourseView />
+              </Page>
+            }
+          />
+          <Route
+            path="/courses/:id"
+            element={
+              <Page>
+                <CourseDetail />
+              </Page>
+            }
+          />
+          <Route
+            path="/checkout"
+            element={
+              <Page>
+                <Checkout />
+              </Page>
+            }
+          />
+          <Route
+            path="/message"
+            element={
+              <Page>
+                <MessagesPage />
+              </Page>
+            }
+          />
+          <Route
+            path="/video-call"
+            element={
+              <Page>
+                <VideoCallPage />
+              </Page>
+            }
+          />
+        </Route>
+        <Route
+          path="/auth"
+          element={
+            <Page>
+              <Auth />
+            </Page>
+          }
+        />
+
+        {/* <Route path="/" element={<Page><Home /></Page>} />
         <Route path="/auth" element={<Page><Auth /></Page>} />
         <Route path="/courses" element={<Page><Course /></Page>} />
         <Route path="/course-view" element={<Page><CourseView /></Page>} />
         <Route path="/courses/:id" element={<Page><CourseDetail /></Page>} />
         <Route path="/checkout" element={<Page><Checkout /></Page>} />
         <Route path="/message" element={<Page><MessagesPage /></Page>} />
-        <Route path="/video-call" element={<Page><VideoCallPage /></Page>} />
+        <Route path="/video-call" element={<Page><VideoCallPage /></Page>} /> */}
 
         {/* Dashboard Admin*/}
         <Route path="/admin" element={<DashboardAdminLayout />}>
