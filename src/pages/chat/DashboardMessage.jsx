@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useRef } from "react";
 import { IoIosMore } from "react-icons/io";
 
 const users = [
@@ -43,10 +43,12 @@ const chatMessages = [
   { id: 4, from: "Jane", text: "Yeah sure, tell me zafor", me: false },
 ];
 
-export default function DashboardTeacherMessage() {
+export default function DashboardMessage() {
   const [selected, setSelected] = useState(users[0]);
   const [messages, setMessages] = useState(chatMessages);
   const [input, setInput] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const handleSend = () => {
     if (!input.trim()) return;
@@ -56,6 +58,19 @@ export default function DashboardTeacherMessage() {
     ]);
     setInput("");
   };
+
+  // Đóng dropdown khi click ra ngoài
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="flex p-5 h-[700px] rounded-xl px-20">
@@ -67,7 +82,6 @@ export default function DashboardTeacherMessage() {
         </div>
         <div className="relative mx-3 mb-3 w-[90%]">
           <span className="absolute inset-y-0 left-2 flex items-center text-slate-400">
-            {/* Icon search (SVG hoặc react-icon) */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-4 w-4"
@@ -90,7 +104,7 @@ export default function DashboardTeacherMessage() {
           />
         </div>
 
-        <div className="overflow-y-auto">
+        <div className="overflow-y-auto h-[calc(100%-80px)]">
           {users.map((u) => (
             <div
               key={u.id}
@@ -118,67 +132,87 @@ export default function DashboardTeacherMessage() {
       <div className="flex flex-1 flex-col">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-3">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={selected.avatar}
-                      alt=""
-                      className="h-10 w-10 rounded-full"
-                    />
-                    <div>
-                      <div className="font-semibold">{selected.name}</div>
-                      <div className="text-xs text-green-500">Active Now</div>
-                    </div>
-                  </div>
-                  {/* Button + Dropdown */}
-                  <div className="relative" ref={dropdownRef}>
+          <div className="flex items-center gap-3">
+            <img
+              src={selected.avatar}
+              alt=""
+              className="h-10 w-10 rounded-full"
+            />
+            <div>
+              <div className="font-semibold">{selected.name}</div>
+              <div className="text-xs text-green-500">Active Now</div>
+            </div>
+          </div>
+          {/* Button + Dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="text-xl text-slate-600 hover:text-slate-800 px-2 py-2 bg-slate-200 rounded-md"
+            >
+              <IoIosMore />
+            </button>
+
+            {dropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md border border-gray-200 z-10">
+                <ul className="py-1 text-sm text-gray-700">
+                  <li>
                     <button
-                      onClick={() => setDropdownOpen(!dropdownOpen)}
-                      className="text-xl text-slate-600 hover:text-slate-800 px-2 py-2 bg-slate-200 rounded-md"
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        alert("Bắt đầu Video Call");
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
                     >
-                      <IoIosMore />
+                      Video call
                     </button>
-        
-                    {dropdownOpen && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md border border-gray-200 z-10">
-                        <ul className="py-1 text-sm text-gray-700">
-                          <li>
-                            <button
-                              onClick={() => {
-                                setDropdownOpen(false);
-                                alert("Bắt đầu Video Call");
-                              }}
-                              className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                            >
-                              Video call
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              onClick={() => {
-                                setDropdownOpen(false);
-                                alert("Tắt/Bật thông báo");
-                              }}
-                              className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                            >
-                              Tắt/Bật thông báo
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              onClick={() => {
-                                setDropdownOpen(false);
-                                alert("Đã chặn người dùng");
-                              }}
-                              className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
-                            >
-                              Chặn
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        alert("Tắt/Bật thông báo");
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                    >
+                      Tắt/Bật thông báo
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        alert("Đã chặn người dùng");
+                      }}
+                      className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
+                    >
+                      Chặn
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Messages */}
+        <div className="flex-1 space-y-4 overflow-y-auto bg-slate-50 p-6">
+          {messages.map((m) => (
+            <div
+              key={m.id}
+              className={`flex ${m.me ? "justify-end" : "justify-start"}`}
+            >
+              <div
+                className={`max-w-xs rounded-lg px-4 py-2 text-sm shadow ${
+                  m.me
+                    ? "bg-orange-500 text-white"
+                    : "bg-orange-50 text-slate-700"
+                }`}
+              >
+                {m.text}
+              </div>
+            </div>
+          ))}
+        </div>
 
         {/* Input */}
         <div className="flex items-center gap-3 border-t border-slate-200 bg-white p-3">

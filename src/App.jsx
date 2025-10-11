@@ -14,7 +14,8 @@ import DashboardProduct from "./pages/admin/DashboardProduct";
 import DashboardCustomer from "./pages/admin/DashboardCustomer";
 import DashboardCourse from "./pages/admin/DashboardCourse";
 import DashboardReport from "./pages/admin/DashboardReport";
-import DashboardSetting from "./pages/admin/DashboardSetting";
+// import DashboardSetting from "./pages/admin/DashboardSetting";
+import DashboardSetting from "./pages/profile/DashboardSetting";
 import DashboardAdminLayout from "./layout/DashboardAdminLayout";
 import DashboardTeacherLayout from "./layout/DashboardTeacherLayout";
 import DashboardTeacherCourse from "./pages/teacher/DashboardTeacherHome";
@@ -25,12 +26,16 @@ import DashboardTeacherMessage from "./pages/teacher/DashboardTeacherMessage";
 import DashboardTeacherSetting from "./pages/teacher/DashboardTeacherSetting";
 import DashboardTeacherHome from "./pages/teacher/DashboardTeacherHome";
 import CourseView from "./pages/course/CourseView";
-import MessagesPage from "./pages/chat/MessageChat";
 import VideoCallPage from "./pages/chat/videocall";
 import DashboardMainLayout from "./layout/DashboardMainLayout";
 import Blog from "./pages/home/Blog";
 import Career from "./pages/home/Career";
 import About from "./pages/home/About";
+import DashboardStudentLayout from "./layout/DashboardStudentLayout";
+import DashboardStudentHome from "./pages/student/DashboardStudentHome"
+import DashboardStudentCourses from "./pages/student/DashboardStudentCourses";
+import DashboardStudentAssignment from "./pages/student/DashboardStudentAssignments";
+import DashboardMessage from "./pages/chat/DashboardMessage";
 
 function App() {
   const location = useLocation();
@@ -103,7 +108,7 @@ function App() {
               </Page>
             }
           />
-          <Route
+          {/* <Route
             path="/message"
             element={
               <Page>
@@ -118,7 +123,7 @@ function App() {
                 <VideoCallPage />
               </Page>
             }
-          />
+          /> */}
         </Route>
         <Route
           path="/auth"
@@ -134,9 +139,7 @@ function App() {
         <Route path="/courses" element={<Page><Course /></Page>} />
         <Route path="/course-view" element={<Page><CourseView /></Page>} />
         <Route path="/courses/:id" element={<Page><CourseDetail /></Page>} />
-        <Route path="/checkout" element={<Page><Checkout /></Page>} />
-        <Route path="/message" element={<Page><MessagesPage /></Page>} />
-        <Route path="/video-call" element={<Page><VideoCallPage /></Page>} /> */}
+        <Route path="/checkout" element={<Page><Checkout /></Page>} /> */}
 
         {/* Dashboard Admin*/}
         <Route path="/admin" element={<DashboardAdminLayout />}>
@@ -156,8 +159,19 @@ function App() {
           <Route path="new-course" element={<DashboardTeacherNewCourse />} />
           <Route path="my-courses" element={<DashboardTeacherMyCourse />} />
           <Route path="earning" element={<DashboardTeacherEarning />} />
-          <Route path="messages" element={<DashboardTeacherMessage />} />
-          <Route path="settings" element={<DashboardTeacherSetting />} />
+          <Route path="messages" element={<DashboardMessage />} />
+          <Route path="video-call" element={<VideoCallPage />} />
+          <Route path="settings" element={<DashboardSetting />} />
+        </Route>
+
+        {/* Dashboard Student */}
+        <Route path="student" element={<DashboardStudentLayout />}>
+          <Route index element={<DashboardStudentHome />} />
+          <Route path="my-courses" element={<DashboardStudentCourses />} />
+          <Route path="assignments" element={<DashboardStudentAssignment />} />
+          <Route path="messages" element={<DashboardMessage />} />
+          <Route path="video-call" element={<VideoCallPage />} />
+          <Route path="settings" element={<DashboardSetting />} />
         </Route>
 
         {/* Teacher Screen */}

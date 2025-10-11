@@ -1,13 +1,13 @@
 import {
   Search, Bell, ShoppingCart, Package, Users, Boxes,
   GraduationCap, BarChart3, Settings, LogOut, LayoutDashboard,
-  PlusSquare,
+  BookOpen, Calendar, FileText,
 } from "lucide-react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { LuMessageCircle } from "react-icons/lu";
 
-export default function DashboardTeacherLayout() {
+export default function DashboardStudentLayout() {
   const location = useLocation();
 
   return (
@@ -20,19 +20,18 @@ export default function DashboardTeacherLayout() {
             <div className="h-10 w-10 rounded-full bg-slate-800 text-white grid place-items-center font-bold">ST</div>
             <div>
               <div className="font-semibold">SweetTreats</div>
-              <div className="text-xs text-slate-500">Bảng điều khiển Giáo viên</div>
+              <div className="text-xs text-slate-500">Bảng điều khiển Học sinh</div>
             </div>
           </div>
 
           {/* Nav */}
           <nav className="flex-1 p-4 space-y-1">
             {[
-              { to: "/teacher", label: "Bảng điều khiển", icon: <LayoutDashboard className="h-5 w-5" /> },
-              { to: "/teacher/new-course", label: "Tạo mới khóa học", icon: <PlusSquare className="h-5 w-5" /> },
-              { to: "/teacher/my-courses", label: "Khóa học của tôi", icon: <GraduationCap className="h-5 w-5" /> },
-              { to: "/teacher/earning", label: "Kiếm tiền", icon: <BarChart3 className="h-5 w-5" /> },
-              { to: "/teacher/messages", label: "Tin nhắn", icon: <LuMessageCircle className="h-5 w-5" /> },
-              { to: "/teacher/settings", label: "Cài đặt", icon: <Settings className="h-5 w-5" /> },
+              { to: "/student", label: "Bảng điều khiển", icon: <LayoutDashboard className="h-5 w-5" /> },
+              { to: "/student/my-courses", label: "Khóa học của tôi", icon: <GraduationCap className="h-5 w-5" /> },
+              { to: "/student/assignments", label: "Bài tập", icon: <FileText className="h-5 w-5" /> },
+              { to: "/student/messages", label: "Tin nhắn", icon: <LuMessageCircle className="h-5 w-5" /> },
+              { to: "/student/settings", label: "Cài đặt", icon: <Settings className="h-5 w-5" /> },
             ].map((item) => (
               <NavLink
                 key={item.label}
@@ -62,8 +61,7 @@ export default function DashboardTeacherLayout() {
         {/* Main */}
         <main className="col-span-12 md:col-span-9 lg:col-span-10 bg-slate-100">
           {/* Topbar */}
-          <div className="flex items-center bg-white
-           justify-between px-6 py-2">
+          <div className="flex items-center bg-white justify-between px-6 py-2">
             <div>
               <div className="text-lg font-semibold">Bảng điều khiển</div>
               <div className="text-sm text-slate-500">Chào mừng trở lại!</div>
@@ -86,8 +84,8 @@ export default function DashboardTeacherLayout() {
               <div className="flex items-center gap-3">
                 <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=80&auto=format&fit=crop" alt="avatar" className="h-9 w-9 rounded-full object-cover" />
                 <div className="hidden sm:block">
-                  <div className="text-sm font-medium">Admin User</div>
-                  <div className="text-xs text-slate-500">admin@sweettreats.com</div>
+                  <div className="text-sm font-medium">Student User</div>
+                  <div className="text-xs text-slate-500">student@sweettreats.com</div>
                 </div>
               </div>
             </div>

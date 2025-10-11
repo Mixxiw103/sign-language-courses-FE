@@ -4,7 +4,7 @@ const VideoCallPage = () => {
     const [score, setScore] = useState(null);
 
     return (
-        <div className="flex h-screen bg-gray-50 p-6">
+        <div className="flex w-screen bg-gray-50 p-6">
             {/* LEFT MAIN AREA */}
             <div className="w-3/4 pr-4 flex flex-col">
                 {/* Header */}
