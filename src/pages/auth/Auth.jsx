@@ -77,8 +77,8 @@ export default function AuthPage() {
               )}
 
               {tab === "register" && (
-                <Field label="User name">
-                  <Input name="username" placeholder="Enter your User name" />
+                <Field label="Full name">
+                  <Input name="full_name" placeholder="Enter your Full name" />
                 </Field>
               )}
 

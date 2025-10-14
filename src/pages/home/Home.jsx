@@ -456,7 +456,7 @@ export default function Home() {
           </p>
           <div className="flex justify-center mt-6">
             <img
-              src="https://via.placeholder.com/300x200"
+              src="https://picsum.photos/300/200"
               alt="Support Team"
               className="rounded-lg shadow-lg mr-4"
             />
