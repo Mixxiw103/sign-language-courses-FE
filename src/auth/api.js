@@ -18,8 +18,8 @@ api.interceptors.request.use((config) => {
   }
 
   // Gắn thêm header khác tùy bạn:
-//   config.headers["x-api-key"] = "YOUR_API_KEY";
-//   config.headers["Content-Type"] = "application/json";
+  //   config.headers["x-api-key"] = "YOUR_API_KEY";
+  //   config.headers["Content-Type"] = "application/json";
 
   return config;
 });
