@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { useClickOutsideDebounce } from "../hooks/useClickOutsideDebounce";
 import { useAuth } from "../auth/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Header() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  // const { user, isAuthenticated, logout } = useAuth();
   const menuRef = useClickOutsideDebounce(() => setIsOpen(false), 200);
 
   const linkBase = "transition-colors px-0 py-2";
@@ -89,12 +90,18 @@ export default function Header() {
                   ref={menuRef}
                   className="absolute right-0 top-10 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10"
                 >
-                  <Link
-                    to="/profile"
-                    className="block px-4 py-2 hover:bg-gray-100"
+                  <button
+                    onClick={() => {
+                      if (!user) return navigate("/auth");
+
+                      if (user.role === "lecturer") navigate("/teacher");
+                      else if (user.role === "student") navigate("/student");
+                      else navigate("/");
+                    }}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                   >
                     Trang cá nhân
-                  </Link>
+                  </button>
                   <Link
                     to="/settings"
                     className="block px-4 py-2 hover:bg-gray-100"

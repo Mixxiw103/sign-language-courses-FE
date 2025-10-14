@@ -23,6 +23,7 @@ export function getUserFromAccessToken(accessToken) {
   // { id, role, email, iat, exp }
   return {
     id: payload.id,
+    full_name: payload.full_name,
     email: payload.email,
     role: payload.role,
     exp: payload.exp,
