@@ -3,7 +3,9 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
+import { useAuth } from "../../auth/AuthContext";
 import React, { useState } from "react";
+import { api, URL_BASE } from "../../auth/api";
 function Btn({ children, onClick, active }) {
   return (
     <button
@@ -17,6 +19,7 @@ function Btn({ children, onClick, active }) {
   );
 }
 export default function DashboardTeacherNewCourse() {
+  const { user } = useAuth();
   const TABS = [
     { key: "basic", label: "Thông tin cơ bản", icon: IconLayers },
     { key: "advance", label: "Thông tin nâng cao", icon: IconChecklist },
@@ -49,7 +52,9 @@ export default function DashboardTeacherNewCourse() {
 
   // ADVANCE
   const [thumbUrl, setThumbUrl] = useState(null);
+  console.log("thumb", thumbUrl);
   const [trailerUrl, setTrailerUrl] = useState(null);
+  console.log("trailerUrl", trailerUrl);
   const [descHtml, setDescHtml] = useState("");
   const [teaches, setTeaches] = useState(["", "", "", ""]);
   const [audience, setAudience] = useState(["", "", "", ""]);
@@ -66,6 +71,7 @@ export default function DashboardTeacherNewCourse() {
       ],
     },
   ]);
+  console.log("sections: ", sections);
 
   // PUBLISH
   const [welcomeMsg, setWelcomeMsg] = useState("");
@@ -126,13 +132,58 @@ export default function DashboardTeacherNewCourse() {
     level !== "Chọn..." &&
     durationVal !== "";
 
-  const onPickThumb = (e) => {
-    const f = e.target.files && e.target.files[0];
-    if (f) setThumbUrl(URL.createObjectURL(f));
+  const onPickThumb = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!/^image\/(png|jpe?g)$/i.test(file.type)) {
+      return alert("Chỉ hỗ trợ ảnh JPG, JPEG, PNG");
+    }
+
+    const form = new FormData();
+    form.append("folder", `courses/images/${user.id}`);
+    form.append("model", "Course");
+    form.append("field", "cover_image_url");
+    form.append("file", file);
+
+    try {
+      const { data } = await api.post("/api/uploads", form, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      setThumbUrl(data.url);
+    } catch (err) {
+      console.error(err);
+      alert("Upload thất bại: " + err.message);
+    } finally {
+    }
   };
-  const onPickTrailer = (e) => {
-    const f = e.target.files && e.target.files[0];
-    if (f) setTrailerUrl(URL.createObjectURL(f));
+  const onPickTrailer = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!/^video\//i.test(file.type)) {
+      return alert("Chỉ hỗ trợ file video");
+    }
+
+    const form = new FormData();
+    form.append("folder", `courses/videos/${user.id}`);
+    // form.append("model", "Course");
+    // form.append("field", "promo_video_url");
+    form.append("file", file);
+
+    try {
+      const { data } = await api.post("/api/uploads", form, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      console.log("data: ", data);
+
+      setTrailerUrl(data.url);
+    } catch (err) {
+      console.error(err);
+      alert("Upload thất bại: " + err.message);
+    } finally {
+    }
   };
 
   const addListItem = (which) => {
@@ -299,7 +350,7 @@ export default function DashboardTeacherNewCourse() {
                   {title.length}/80
                 </div>
               </div>
-
+              {/* 
               <div className="mb-5">
                 <label className="mb-1 block text-sm font-medium text-slate-700">
                   Tiêu đề phụ
@@ -447,7 +498,7 @@ export default function DashboardTeacherNewCourse() {
                   </div>
                 </div>
               </div>
-
+*/}
               <div className="mt-8 flex items-center justify-between">
                 <button className="rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">
                   Hủy bỏ
@@ -498,7 +549,7 @@ export default function DashboardTeacherNewCourse() {
                   </label>
                   {thumbUrl && (
                     <img
-                      src={thumbUrl}
+                      src={URL_BASE + thumbUrl}
                       className="mt-3 h-28 rounded-md object-cover"
                     />
                   )}
@@ -525,7 +576,7 @@ export default function DashboardTeacherNewCourse() {
                   </label>
                   {trailerUrl && (
                     <video
-                      src={trailerUrl}
+                      src={URL_BASE + trailerUrl}
                       controls
                       className="mt-3 h-28 rounded-md"
                     />
@@ -602,7 +653,7 @@ export default function DashboardTeacherNewCourse() {
                   />
                 </div>
               </div>
-
+              {/* 
               <div className="mt-8 space-y-8">
                 {[
                   {
@@ -660,7 +711,7 @@ export default function DashboardTeacherNewCourse() {
                   </div>
                 ))}
               </div>
-
+*/}
               <div className="mt-8 flex items-center justify-between">
                 <button
                   onClick={prev}
