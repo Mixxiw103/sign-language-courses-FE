@@ -5,8 +5,11 @@ import HomeIntroduceImg from "../../assets/Home_introduce.png";
 import CourseCard from "../../components/CourseCard";
 import { ArrowRight } from "lucide-react";
 import Footer from "../../components/Footer";
+import { useAuth } from "../../auth/AuthContext";
 
 export default function Home() {
+  const { user } = useAuth();
+  console.log("user: ", user);
   const [showVideo, setShowVideo] = useState(false);
   const sampleCourse = {
     image:

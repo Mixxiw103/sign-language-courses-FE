@@ -2,8 +2,10 @@ import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoMdEye, IoMdEyeOff, IoIosArrowRoundBack } from "react-icons/io";
 import { authApi } from "../../utils/apis/authService";
+import { useAuth } from "../../auth/AuthContext";
 
 export default function AuthPage() {
+  const { login } = useAuth();
   const [tab, setTab] = useState("login"); // 'login' | 'register'
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -18,11 +20,15 @@ export default function AuthPage() {
       setLoading(true);
 
       if (tab === "login") {
-        const res = await authApi.login(formData);
-        localStorage.setItem("accessToken", res.data.access_token);
-        localStorage.setItem("refreshToken", res.data.refresh_token);
-        alert("Login success!");
-        navigate("/"); // redirect về trang chủ
+        // const res = await authApi.login(formData);
+        // localStorage.setItem("accessToken", res.data.access_token);
+        // localStorage.setItem("refreshToken", res.data.refresh_token);
+        await login({
+          email: formData.email,
+          password: formData.password,
+        });
+        // alert("Login success!");
+        navigate("/");
       } else {
         await authApi.register(formData);
         alert("Register success! You can login now.");
@@ -50,7 +56,9 @@ export default function AuthPage() {
           />
           <div className="absolute bottom-6 left-6 bg-black/40 p-6 rounded-2xl text-white max-w-md">
             <h2 className="text-2xl md:text-3xl font-bold">Welcome</h2>
-            <p className="mt-2 text-sm text-slate-200">Login or register to continue</p>
+            <p className="mt-2 text-sm text-slate-200">
+              Login or register to continue
+            </p>
           </div>
         </div>
       </div>
@@ -60,19 +68,34 @@ export default function AuthPage() {
         <div className="w-full max-w-md p-8 mt-24">
           {/* Tabs */}
           <div className="flex justify-center gap-2">
-            <TabBtn active={tab === "login"} onClick={() => setTab("login")}>Login</TabBtn>
-            <TabBtn active={tab === "register"} onClick={() => setTab("register")}>Register</TabBtn>
+            <TabBtn active={tab === "login"} onClick={() => setTab("login")}>
+              Login
+            </TabBtn>
+            <TabBtn
+              active={tab === "register"}
+              onClick={() => setTab("register")}
+            >
+              Register
+            </TabBtn>
           </div>
 
           <p className="mt-6 text-center text-xs leading-5 text-slate-500">
             Lorem Ipsum dummy text
           </p>
 
-          <form ref={formRef} onSubmit={handleSubmit} className="mt-6 space-y-4 text-left">
+          <form
+            ref={formRef}
+            onSubmit={handleSubmit}
+            className="mt-6 space-y-4 text-left"
+          >
             <div className="space-y-4">
               {tab === "register" && (
                 <Field label="Email Address">
-                  <Input name="email" type="email" placeholder="Enter your Email Address" />
+                  <Input
+                    name="email"
+                    type="email"
+                    placeholder="Enter your Email Address"
+                  />
                 </Field>
               )}
 
@@ -84,7 +107,11 @@ export default function AuthPage() {
 
               {tab === "login" && (
                 <Field label="Email Address">
-                  <Input name="email" type="email" placeholder="Enter your Email Address" />
+                  <Input
+                    name="email"
+                    type="email"
+                    placeholder="Enter your Email Address"
+                  />
                 </Field>
               )}
 
@@ -110,11 +137,22 @@ export default function AuthPage() {
                 <Field label="Bạn là?">
                   <div className="flex gap-3">
                     <label className="inline-flex items-center gap-2">
-                      <input type="radio" name="role" value="giaovien" defaultChecked className="h-4 w-4 accent-slate-900" />
+                      <input
+                        type="radio"
+                        name="role"
+                        value="giaovien"
+                        defaultChecked
+                        className="h-4 w-4 accent-slate-900"
+                      />
                       <span className="text-sm text-slate-700">Giáo viên</span>
                     </label>
                     <label className="inline-flex items-center gap-2">
-                      <input type="radio" name="role" value="hocsinh" className="h-4 w-4 accent-slate-900" />
+                      <input
+                        type="radio"
+                        name="role"
+                        value="hocsinh"
+                        className="h-4 w-4 accent-slate-900"
+                      />
                       <span className="text-sm text-slate-700">Học sinh</span>
                     </label>
                   </div>
@@ -124,10 +162,16 @@ export default function AuthPage() {
               {tab === "login" && (
                 <div className="flex items-center justify-between text-xs text-slate-500">
                   <label className="inline-flex items-center gap-2">
-                    <input type="checkbox" name="remember" className="h-4 w-4" />
+                    <input
+                      type="checkbox"
+                      name="remember"
+                      className="h-4 w-4"
+                    />
                     <span>Remember me</span>
                   </label>
-                  <a href="#" className="hover:text-slate-700">Forgot Password?</a>
+                  <a href="#" className="hover:text-slate-700">
+                    Forgot Password?
+                  </a>
                 </div>
               )}
             </div>
@@ -137,7 +181,11 @@ export default function AuthPage() {
               disabled={loading}
               className="cursor-pointer w-full rounded-full bg-slate-900 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
             >
-              {loading ? "Processing..." : tab === "login" ? "Login" : "Register"}
+              {loading
+                ? "Processing..."
+                : tab === "login"
+                ? "Login"
+                : "Register"}
             </button>
 
             <div
@@ -161,7 +209,9 @@ function TabBtn({ active, onClick, children }) {
       onClick={onClick}
       className={
         "cursor-pointer px-10 py-2 rounded-full text-sm font-medium transition-colors " +
-        (active ? "bg-slate-900 text-white" : "bg-primary text-slate-700 hover:bg-slate-200")
+        (active
+          ? "bg-slate-900 text-white"
+          : "bg-primary text-slate-700 hover:bg-slate-200")
       }
     >
       {children}
