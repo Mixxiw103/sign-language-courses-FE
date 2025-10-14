@@ -221,12 +221,12 @@ export default function DashboardTeacherNewCourse() {
       s.map((sec) =>
         sec.id === sid
           ? {
-              ...sec,
-              lectures: [
-                ...sec.lectures,
-                { id: Date.now(), name: "Tên bài học", menuOpen: false },
-              ],
-            }
+            ...sec,
+            lectures: [
+              ...sec.lectures,
+              { id: Date.now(), name: "Tên bài học", menuOpen: false },
+            ],
+          }
           : sec
       )
     );
@@ -235,11 +235,11 @@ export default function DashboardTeacherNewCourse() {
       s.map((sec) =>
         sec.id === sid
           ? {
-              ...sec,
-              lectures: sec.lectures.map((l) =>
-                l.id === lid ? { ...l, name } : l
-              ),
-            }
+            ...sec,
+            lectures: sec.lectures.map((l) =>
+              l.id === lid ? { ...l, name } : l
+            ),
+          }
           : sec
       )
     );
@@ -256,11 +256,11 @@ export default function DashboardTeacherNewCourse() {
       s.map((sec) =>
         sec.id === sid
           ? {
-              ...sec,
-              lectures: sec.lectures.map((l) =>
-                l.id === lid ? { ...l, menuOpen: !l.menuOpen } : l
-              ),
-            }
+            ...sec,
+            lectures: sec.lectures.map((l) =>
+              l.id === lid ? { ...l, menuOpen: !l.menuOpen } : l
+            ),
+          }
           : sec
       )
     );
@@ -295,11 +295,10 @@ export default function DashboardTeacherNewCourse() {
               <button
                 key={t.key}
                 onClick={() => setTab(i)}
-                className={`flex items-center gap-2 border-b-2 px-2 py-3 text-sm font-medium ${
-                  tab === i
+                className={`flex items-center gap-2 border-b-2 px-2 py-3 text-sm font-medium ${tab === i
                     ? "border-orange-500 text-slate-900"
                     : "border-transparent text-slate-500 hover:text-slate-700"
-                }`}
+                  }`}
               >
                 <t.icon className="h-4 w-4 text-slate-600" />
                 {t.label}
@@ -506,11 +505,10 @@ export default function DashboardTeacherNewCourse() {
                 <button
                   disabled={!basicValid}
                   onClick={next}
-                  className={`rounded-md px-4 py-2 text-sm font-semibold text-white ${
-                    basicValid
+                  className={`rounded-md px-4 py-2 text-sm font-semibold text-white ${basicValid
                       ? "bg-orange-500 hover:bg-orange-600"
                       : "bg-slate-300"
-                  }`}
+                    }`}
                 >
                   Lưu và tiếp tục
                 </button>
