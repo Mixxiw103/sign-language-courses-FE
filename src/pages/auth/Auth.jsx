@@ -1,14 +1,46 @@
-// src/AuthPage.jsx
-import { useState } from "react";
-import { IoMdEye,IoMdEyeOff,IoIosArrowRoundBack   } from "react-icons/io";
+import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { IoMdEye, IoMdEyeOff, IoIosArrowRoundBack } from "react-icons/io";
+import { authApi } from "../../utils/apis/authService";
 
-export default function Auth() {
+export default function AuthPage() {
   const [tab, setTab] = useState("login"); // 'login' | 'register'
   const [showPass, setShowPass] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const formRef = useRef(null);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = Object.fromEntries(new FormData(formRef.current));
+
+    try {
+      setLoading(true);
+
+      if (tab === "login") {
+        const res = await authApi.login(formData);
+        localStorage.setItem("accessToken", res.data.access_token);
+        localStorage.setItem("refreshToken", res.data.refresh_token);
+        alert("Login success!");
+        navigate("/"); // redirect về trang chủ
+      } else {
+        await authApi.register(formData);
+        alert("Register success! You can login now.");
+        setTab("login");
+      }
+
+      formRef.current?.reset(); // reset form an toàn
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+      alert(err.response?.data?.error || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex min-h-screen w-full bg-white">
-      {/* LEFT: Image (desktop) */}
+      {/* LEFT IMAGE */}
       <div className="hidden md:flex w-1/2 items-center justify-center p-20">
         <div className="relative w-full h-full">
           <img
@@ -16,16 +48,15 @@ export default function Auth() {
             alt="Classroom"
             className="w-full h-full object-cover rounded-2xl"
           />
-          {/* Overlay text */}
           <div className="absolute bottom-6 left-6 bg-black/40 p-6 rounded-2xl text-white max-w-md">
-            <h2 className="text-2xl md:text-3xl font-bold">Lorem Ipsum is simply</h2>
-            <p className="mt-2 text-sm text-slate-200">Lorem ipsum is simply</p>
+            <h2 className="text-2xl md:text-3xl font-bold">Welcome</h2>
+            <p className="mt-2 text-sm text-slate-200">Login or register to continue</p>
           </div>
         </div>
       </div>
 
-      {/* RIGHT: Form */}
-      <div className="flex w-full md:w-1/2 items-start justify-center ">
+      {/* RIGHT FORM */}
+      <div className="flex w-full md:w-1/2 items-start justify-center">
         <div className="w-full max-w-md p-8 mt-24">
           {/* Tabs */}
           <div className="flex justify-center gap-2">
@@ -34,18 +65,10 @@ export default function Auth() {
           </div>
 
           <p className="mt-6 text-center text-xs leading-5 text-slate-500">
-            Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+            Lorem Ipsum dummy text
           </p>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const data = Object.fromEntries(new FormData(e.currentTarget));
-              alert(JSON.stringify({ tab, ...data }, null, 2));
-            }}
-            className="mt-6 space-y-4 text-left"
-          >
-            {/* Vùng thay đổi – cố định chiều cao để không “nhảy” khi đổi tab */}
+          <form ref={formRef} onSubmit={handleSubmit} className="mt-6 space-y-4 text-left">
             <div className="space-y-4">
               {tab === "register" && (
                 <Field label="Email Address">
@@ -53,9 +76,17 @@ export default function Auth() {
                 </Field>
               )}
 
-              <Field label="User name">
-                <Input name="username" placeholder="Enter your User name" />
-              </Field>
+              {tab === "register" && (
+                <Field label="User name">
+                  <Input name="username" placeholder="Enter your User name" />
+                </Field>
+              )}
+
+              {tab === "login" && (
+                <Field label="Email Address">
+                  <Input name="email" type="email" placeholder="Enter your Email Address" />
+                </Field>
+              )}
 
               <Field label="Password">
                 <div className="relative">
@@ -69,24 +100,17 @@ export default function Auth() {
                     type="button"
                     onClick={() => setShowPass((v) => !v)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
-                    aria-label="Toggle password"
                   >
                     {showPass ? <IoMdEyeOff /> : <IoMdEye />}
                   </button>
                 </div>
               </Field>
 
-              {tab === "register" ? (
+              {tab === "register" && (
                 <Field label="Bạn là?">
                   <div className="flex gap-3">
                     <label className="inline-flex items-center gap-2">
-                      <input
-                        type="radio"
-                        name="role"
-                        value="giaovien"
-                        defaultChecked
-                        className="h-4 w-4 accent-slate-900"
-                      />
+                      <input type="radio" name="role" value="giaovien" defaultChecked className="h-4 w-4 accent-slate-900" />
                       <span className="text-sm text-slate-700">Giáo viên</span>
                     </label>
                     <label className="inline-flex items-center gap-2">
@@ -95,7 +119,9 @@ export default function Auth() {
                     </label>
                   </div>
                 </Field>
-              ) : (
+              )}
+
+              {tab === "login" && (
                 <div className="flex items-center justify-between text-xs text-slate-500">
                   <label className="inline-flex items-center gap-2">
                     <input type="checkbox" name="remember" className="h-4 w-4" />
@@ -106,23 +132,21 @@ export default function Auth() {
               )}
             </div>
 
-            {/* Submit */}
             <button
-              className="cursor-pointer w-full rounded-full bg-slate-900 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
               type="submit"
+              disabled={loading}
+              className="cursor-pointer w-full rounded-full bg-slate-900 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
             >
-              {tab === "login" ? "Login" : "Register"}
+              {loading ? "Processing..." : tab === "login" ? "Login" : "Register"}
             </button>
+
             <div
-      onClick={() => {
-    // Ví dụ: quay lại trang trước
-    window.history.back();
-  }}
-      className="cursor-pointer w-full flex items-center justify-center gap-2 rounded-full bg-slate-500 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
-    >
-      <IoIosArrowRoundBack className="text-xl" />
-      Trở lại trang trước 😭
-    </div>
+              onClick={() => window.history.back()}
+              className="cursor-pointer w-full flex items-center justify-center gap-2 rounded-full bg-slate-500 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
+            >
+              <IoIosArrowRoundBack className="text-xl" />
+              Trở lại trang trước 😭
+            </div>
           </form>
         </div>
       </div>
@@ -130,7 +154,7 @@ export default function Auth() {
   );
 }
 
-/* ————— Small components ————— */
+/* ——— Small components ——— */
 function TabBtn({ active, onClick, children }) {
   return (
     <button

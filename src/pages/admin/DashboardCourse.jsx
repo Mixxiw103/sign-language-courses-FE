@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { Star, Users, GraduationCap } from "lucide-react";
+
 const courses = [
   {
     id: 1,
@@ -11,7 +13,8 @@ const courses = [
     students: 245,
     rating: 4.8,
     status: "published",
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop",
   },
   {
     id: 2,
@@ -22,7 +25,8 @@ const courses = [
     students: 189,
     rating: 4.9,
     status: "published",
-    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop",
   },
   {
     id: 3,
@@ -33,7 +37,8 @@ const courses = [
     students: 156,
     rating: 4.7,
     status: "published",
-    image: "https://images.unsplash.com/photo-1514790193030-c89d266d5a9d?q=80&w=1200&auto=format&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1514790193030-c89d266d5a9d?q=80&w=1200&auto=format&fit=crop",
   },
   {
     id: 4,
@@ -44,12 +49,14 @@ const courses = [
     students: 78,
     rating: 4.9,
     status: "draft",
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop",
   },
 ];
 
 export default function DashboardCourse() {
   const [search, setSearch] = useState("");
+  const navigate = useNavigate();
 
   const filtered = courses.filter(
     (c) =>
@@ -57,9 +64,13 @@ export default function DashboardCourse() {
       c.instructor.toLowerCase().includes(search.toLowerCase())
   );
 
+  const handleNavigate = (id) => {
+    navigate(`/courses/${id}`);
+  };
+
   return (
     <div className="p-6 bg-[#FFF7ED] min-h-screen">
-      <div className="max-w-full mx-auto bg-white rounded-xl shadow ">
+      <div className="max-w-full mx-auto bg-white rounded-xl shadow">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <div>
@@ -105,7 +116,8 @@ export default function DashboardCourse() {
             {filtered.map((c) => (
               <tr
                 key={c.id}
-                className="bg-white hover:bg-gray-50 align-middle"
+                className="bg-white hover:bg-gray-50 cursor-pointer transition"
+                onClick={() => handleNavigate(c.id)}
               >
                 {/* Course */}
                 <td className="py-3 px-2 text-left">
@@ -116,7 +128,9 @@ export default function DashboardCourse() {
                       className="w-12 h-12 rounded object-cover border"
                     />
                     <div>
-                      <p className="font-medium text-gray-800">{c.title}</p>
+                      <p className="font-medium text-gray-800 hover:text-teal-600">
+                        {c.title}
+                      </p>
                       <p className="text-sm text-gray-500">{c.instructor}</p>
                     </div>
                   </div>
@@ -124,14 +138,14 @@ export default function DashboardCourse() {
 
                 {/* Category */}
                 <td className="py-3 px-2 text-left">
-                  <span className="px-3 py-1 text-xs font-medium   text-gray-600">
+                  <span className="px-3 py-1 text-xs font-medium text-gray-600">
                     {c.category}
                   </span>
                 </td>
 
                 {/* Price */}
                 <td className="py-3 px-2 text-gray-800 text-left">
-                  $ {c.price}
+                  ${c.price}
                 </td>
 
                 {/* Students */}
@@ -145,7 +159,10 @@ export default function DashboardCourse() {
                 {/* Rating */}
                 <td className="py-3 px-2 text-gray-700 text-left">
                   <div className="flex items-center gap-1">
-                    <Star size={16} className="text-yellow-500 fill-yellow-500" />
+                    <Star
+                      size={16}
+                      className="text-yellow-500 fill-yellow-500"
+                    />
                     {c.rating}
                   </div>
                 </td>
@@ -154,8 +171,8 @@ export default function DashboardCourse() {
                 <td className="py-3 px-2 text-left">
                   <span
                     className={`px-3 py-1 text-xs font-medium rounded-full ${c.status === "published"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-yellow-100 text-yellow-700"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-yellow-100 text-yellow-700"
                       }`}
                   >
                     {c.status}
@@ -163,7 +180,10 @@ export default function DashboardCourse() {
                 </td>
 
                 {/* Actions */}
-                <td className="py-3 px-2 text-left">
+                <td
+                  className="py-3 px-2 text-left"
+                  onClick={(e) => e.stopPropagation()} // chặn click trùng
+                >
                   <div className="flex gap-3">
                     <button className="text-gray-500 hover:text-gray-700">
                       <FiEdit size={18} />
@@ -176,7 +196,6 @@ export default function DashboardCourse() {
               </tr>
             ))}
           </tbody>
-
         </table>
       </div>
     </div>
