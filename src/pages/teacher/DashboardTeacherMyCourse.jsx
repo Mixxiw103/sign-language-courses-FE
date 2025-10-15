@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
-import { useAuth } from "../../auth/AuthContext"; // ✅ lấy từ context
+import { useAuth } from "../../auth/AuthContext"; //  lấy từ context
 import CourseCard from "../../components/CourseCard"; // tuỳ bạn, có thể hiển thị thẳng trong file này
 
 export default function DashboardTeacherMyCourse() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Lấy user và axios instance từ AuthContext
+  //  Lấy user và axios instance từ AuthContext
   const { user, isAuthenticated, loading: authLoading, api } = useAuth();
 
   useEffect(() => {
@@ -24,9 +24,9 @@ export default function DashboardTeacherMyCourse() {
         });
 
         setCourses(res.data.items || []);
-        console.log("📦 Courses từ API:", courses);
+        console.log(" Courses từ API:", courses);
       } catch (err) {
-        console.error("❌ Lỗi khi tải danh sách khóa học:", err);
+        console.error(" Lỗi khi tải danh sách khóa học:", err);
       } finally {
         setLoading(false);
       }
@@ -35,7 +35,7 @@ export default function DashboardTeacherMyCourse() {
     fetchCourses();
   }, [authLoading, isAuthenticated, user, api]);
 
-  // 🌀 Loading UI
+  //  Loading UI
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64 text-gray-500">
@@ -45,7 +45,7 @@ export default function DashboardTeacherMyCourse() {
     );
   }
 
-  // 📭 Không có khóa học nào
+  //  Không có khóa học nào
   if (courses.length === 0) {
     return (
       <div className="text-center text-gray-500 py-10">
@@ -54,7 +54,7 @@ export default function DashboardTeacherMyCourse() {
     );
   }
 
-  // 🎓 Hiển thị danh sách khóa học
+  //  Hiển thị danh sách khóa học
   return (
     <div className="p-6">
       <h2 className="text-2xl font-semibold mb-6">Khoá học của tôi</h2>

@@ -102,9 +102,9 @@ export function AuthProvider({ children }) {
   }, [refreshToken]);
 
   // ====== API: login / refresh / logout ======
-  async function login({ email, password }) {
+  async function login({ email, password, captchaToken }) {
     // Gọi endpoint đăng nhập của bạn, ví dụ: POST /auth/login
-    const res = await api.post("/api/auth/login", { email, password });
+    const res = await api.post("/api/auth/login", { email, password, captchaToken });
     const { access_token, refresh_token } = res.data;
 
     setAccessToken(access_token);
@@ -138,7 +138,7 @@ export function AuthProvider({ children }) {
     try {
       // Nếu có endpoint logout server (revoke refresh token), gọi vào đây
       // await api.post('/auth/logout', { refresh_token: refreshToken });
-    } catch {}
+    } catch { }
     setAccessToken(null);
     setRefreshToken(null);
     setUser(null);
