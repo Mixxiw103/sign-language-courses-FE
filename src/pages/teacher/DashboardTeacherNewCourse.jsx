@@ -40,6 +40,8 @@ export default function DashboardTeacherNewCourse() {
 
   // BASIC
   const [title, setTitle] = useState("");
+
+  const [price, setPrice] = useState();
   const [subtitle, setSubtitle] = useState("");
   const [category, setCategory] = useState("Chọn...");
   const [subcategory, setSubcategory] = useState("Chọn...");
@@ -64,14 +66,26 @@ export default function DashboardTeacherNewCourse() {
   const [sections, setSections] = useState([
     {
       id: 1,
-      name: "Tên bài học",
+      name: "Tên Chương học",
       lectures: [
-        { id: 11, name: "Tên bài học", menuOpen: false },
-        { id: 12, name: "Tên tài liệu", menuOpen: false },
+        { id: 1, name: "Tên bài học 1", videoUrl: "" },
+        { id: 2, name: "Tên bài học 2", videoUrl: "" },
       ],
     },
   ]);
   console.log("sections: ", sections);
+  const updateLectureVideoUrl = (lectureId, newUrl) => {
+    setSections((prevSections) =>
+      prevSections.map((section) => ({
+        ...section,
+        lectures: section.lectures.map((lec) =>
+          lec.id === lectureId
+            ? { ...lec, videoUrl: newUrl } // cập nhật lecture này
+            : lec
+        ),
+      }))
+    );
+  };
 
   // PUBLISH
   const [welcomeMsg, setWelcomeMsg] = useState("");
@@ -221,12 +235,12 @@ export default function DashboardTeacherNewCourse() {
       s.map((sec) =>
         sec.id === sid
           ? {
-            ...sec,
-            lectures: [
-              ...sec.lectures,
-              { id: Date.now(), name: "Tên bài học", menuOpen: false },
-            ],
-          }
+              ...sec,
+              lectures: [
+                ...sec.lectures,
+                { id: Date.now(), name: "Tên bài học", videoUrl: "" },
+              ],
+            }
           : sec
       )
     );
@@ -235,11 +249,11 @@ export default function DashboardTeacherNewCourse() {
       s.map((sec) =>
         sec.id === sid
           ? {
-            ...sec,
-            lectures: sec.lectures.map((l) =>
-              l.id === lid ? { ...l, name } : l
-            ),
-          }
+              ...sec,
+              lectures: sec.lectures.map((l) =>
+                l.id === lid ? { ...l, name } : l
+              ),
+            }
           : sec
       )
     );
@@ -256,11 +270,11 @@ export default function DashboardTeacherNewCourse() {
       s.map((sec) =>
         sec.id === sid
           ? {
-            ...sec,
-            lectures: sec.lectures.map((l) =>
-              l.id === lid ? { ...l, menuOpen: !l.menuOpen } : l
-            ),
-          }
+              ...sec,
+              lectures: sec.lectures.map((l) =>
+                l.id === lid ? { ...l, menuOpen: !l.menuOpen } : l
+              ),
+            }
           : sec
       )
     );
@@ -283,6 +297,72 @@ export default function DashboardTeacherNewCourse() {
       setDescHtml(editor.getHTML());
     },
   });
+  const [uploading, setUploading] = React.useState(false);
+
+  const handleVideoUpload = async (lecId, file, lecVideoUrl) => {
+    if (!file) return;
+
+    const fd = new FormData();
+    fd.append("folder", `courses/videos/${user.id}`);
+    fd.append("file", file); // tên "video" trùng với field backend nhận
+
+    try {
+      setUploading(true);
+      // const res = await fetch(`/api/lectures/${lecId}/video`, {
+      //   method: "POST",
+      //   body: fd,
+      // });
+      const res = await api.post("/api/uploads", fd);
+
+      const { url } = res.data;
+      updateLectureVideoUrl(lecId, url);
+      alert("upload successfully!");
+
+      // nếu muốn: cập nhật lại state sections ở đây
+    } catch (err) {
+      console.error(err);
+      alert("Tải video thất bại!");
+    } finally {
+      setUploading(false);
+    }
+  };
+  const handleSubmitCreate = async () => {
+    try {
+      // ======= B1: Chuẩn bị object =======
+      const payload = {
+        course: {
+          title: title.trim(),
+          description: descHtml,
+          lecturer_id: user.id, // hoặc lấy từ context
+          price: Number(price),
+          status: "published",
+        },
+        chapters: sections.map((sec, secIdx) => ({
+          title: sec.name,
+          order_index: secIdx,
+          lessons: sec.lectures.map((lec, lecIdx) => ({
+            title: lec.name,
+            order_index: lecIdx,
+            video_url: lec.videoUrl || "",
+            documents: lec.documents || [],
+          })),
+        })),
+      };
+
+      console.log("Payload gửi lên server:", payload);
+
+      // ======= B2: Gửi lên server =======
+      const res = await api.post("/api/courses/create-structure", payload);
+
+      if (res.status === 200 || res.status === 201) {
+        alert("Tạo khóa học thành công!");
+        console.log("Server trả về:", res.data);
+      }
+    } catch (err) {
+      console.error("Lỗi gửi khóa học:", err.response?.data || err.message);
+      alert("Gửi dữ liệu thất bại!");
+    }
+  };
 
   if (!editor) return null;
   return (
@@ -295,10 +375,11 @@ export default function DashboardTeacherNewCourse() {
               <button
                 key={t.key}
                 onClick={() => setTab(i)}
-                className={`flex items-center gap-2 border-b-2 px-2 py-3 text-sm font-medium ${tab === i
+                className={`flex items-center gap-2 border-b-2 px-2 py-3 text-sm font-medium ${
+                  tab === i
                     ? "border-orange-500 text-slate-900"
                     : "border-transparent text-slate-500 hover:text-slate-700"
-                  }`}
+                }`}
               >
                 <t.icon className="h-4 w-4 text-slate-600" />
                 {t.label}
@@ -348,6 +429,21 @@ export default function DashboardTeacherNewCourse() {
                 <div className="mt-1 text-right text-xs text-slate-400">
                   {title.length}/80
                 </div>
+              </div>
+              <div className="mb-5">
+                <label className="mb-1 block text-sm font-medium text-slate-700">
+                  Giá
+                </label>
+                <input
+                  type="number"
+                  value={price}
+                  onChange={(e) => setPrice(Number(e.target.value))}
+                  placeholder="Nhập giá khóa học (VNĐ)"
+                  className="w-full rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] px-3 py-2 text-sm"
+                />
+                {/* <div className="mt-1 text-right text-xs text-slate-400">
+                  {subtitle.length}/120
+                </div> */}
               </div>
               {/* 
               <div className="mb-5">
@@ -503,12 +599,8 @@ export default function DashboardTeacherNewCourse() {
                   Hủy bỏ
                 </button>
                 <button
-                  disabled={!basicValid}
                   onClick={next}
-                  className={`rounded-md px-4 py-2 text-sm font-semibold text-white ${basicValid
-                      ? "bg-orange-500 hover:bg-orange-600"
-                      : "bg-slate-300"
-                    }`}
+                  className="rounded-md bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600"
                 >
                   Lưu và tiếp tục
                 </button>
@@ -721,7 +813,7 @@ export default function DashboardTeacherNewCourse() {
                   onClick={next}
                   className="rounded-md bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600"
                 >
-                  Save & Next
+                  Lưu và tiếp tục
                 </button>
               </div>
             </div>
@@ -743,7 +835,7 @@ export default function DashboardTeacherNewCourse() {
                     <div className="mb-3 flex items-center gap-3">
                       <span className="text-slate-400">≡</span>
                       <span className="text-sm text-slate-500">
-                        Bài học {String(sIdx + 1).padStart(2, "0")}:
+                        Chương học {String(sIdx + 1).padStart(2, "0")}:
                       </span>
                       <input
                         value={sec.name}
@@ -778,15 +870,15 @@ export default function DashboardTeacherNewCourse() {
                             }
                             className="flex-1 rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] px-3 py-2 text-sm"
                           />
-                          <div className="relative">
+                          <div className="relative flex items-center justify-center gap-4 h-24">
                             <button
                               onClick={() => toggleLectureMenu(sec.id, lec.id)}
-                              className="rounded-md bg-white px-3 py-2 text-sm ring-1 ring-slate-200"
+                              className="rounded-md bg-white px-3 h-20 text-sm ring-1 ring-slate-200"
                             >
                               Contents{" "}
                               <IconChevronDown className="ml-1 inline h-4 w-4" />
                             </button>
-                            {lec.menuOpen && (
+                            {/* {lec.menuOpen && (
                               <div className="absolute right-0 z-10 mt-2 w-44 rounded-md bg-white p-1 shadow-lg ring-1 ring-slate-200">
                                 {[
                                   "Video",
@@ -803,6 +895,36 @@ export default function DashboardTeacherNewCourse() {
                                   </button>
                                 ))}
                               </div>
+                            )} */}
+
+                            {lec.videoUrl ? (
+                              <video
+                                src={URL_BASE + lec.videoUrl}
+                                controls
+                                className=" h-20 rounded-md"
+                              />
+                            ) : (
+                              <label
+                                className={`rounded-md bg-white h-20 px-3 flex items-center text-sm ring-1 ring-slate-200 cursor-pointer hover:bg-slate-50 ${
+                                  uploading
+                                    ? "opacity-50 pointer-events-none"
+                                    : ""
+                                }`}
+                              >
+                                {uploading ? "Đang tải..." : "Add video"}
+                                <input
+                                  type="file"
+                                  accept="video/*"
+                                  className="hidden"
+                                  onChange={(e) =>
+                                    handleVideoUpload(
+                                      lec.id,
+                                      e.target.files[0],
+                                      lec.videoUrl
+                                    )
+                                  }
+                                />
+                              </label>
                             )}
                           </div>
                           <IconTrash
@@ -830,10 +952,10 @@ export default function DashboardTeacherNewCourse() {
                   Previous
                 </button>
                 <button
-                  onClick={next}
+                  onClick={handleSubmitCreate}
                   className="rounded-md bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600"
                 >
-                  Save & Next
+                  Đăng tải
                 </button>
               </div>
             </div>
