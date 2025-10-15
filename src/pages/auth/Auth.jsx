@@ -11,9 +11,21 @@ export default function AuthPage() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState(null);
+  const [otpStep, setOtpStep] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [email, setEmail] = useState("");
   const formRef = useRef(null);
   const navigate = useNavigate();
+  const captchaRef = useRef(null); //  thêm ref cho reCAPTCHA
 
+  // --- Đổi tab login/register ---
+  const handleSwitchTab = (target) => {
+    setTab(target);
+    setCaptchaToken(null);
+    captchaRef.current?.reset(); //  reset reCAPTCHA khi đổi tab
+  };
+
+  // --- Submit LOGIN / REGISTER ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = Object.fromEntries(new FormData(formRef.current));
@@ -27,11 +39,20 @@ export default function AuthPage() {
       setLoading(true);
 
       if (tab === "login") {
-        await login({
+        const res = await authApi.login({
           email: formData.email,
           password: formData.password,
-          captchaToken, // gửi kèm token sang backend
+          captchaToken,
         });
+
+        if (res.data?.step === "VERIFY_OTP") {
+          setEmail(res.data.email);
+          setOtpStep(true);
+          alert("OTP đã được gửi đến email của bạn!");
+          return;
+        }
+
+        alert("Đăng nhập thành công!");
         navigate("/");
       } else {
         await authApi.register({
@@ -40,19 +61,94 @@ export default function AuthPage() {
         });
         alert("Đăng ký thành công! Vui lòng đăng nhập.");
         setTab("login");
+
+        //  reset CAPTCHA khi chuyển sang login
+        captchaRef.current?.reset();
+        setCaptchaToken(null);
       }
 
       formRef.current?.reset();
+      captchaRef.current?.reset(); //  reset luôn sau khi submit thành công
       setCaptchaToken(null);
     } catch (err) {
-
       console.error(err.response?.data || err.message);
-      alert(err.response?.data?.message || "Đã có lỗi xảy ra!");
+      alert(err.response?.data?.error || "Đã có lỗi xảy ra!");
     } finally {
       setLoading(false);
     }
   };
 
+  // --- Xác minh OTP ---
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const res = await authApi.verifyOtp({ email, otp });
+
+      const access = res.data.access_token;
+      const refresh = res.data.refresh_token;
+
+      //  Gọi hàm login của AuthContext để đồng bộ state toàn hệ thống
+      login({
+        email,
+        password: null, // không cần, chỉ để giữ interface
+        captchaToken: null, // không cần
+        access_token: access,
+        refresh_token: refresh,
+      });
+
+      alert("Xác minh OTP thành công!");
+      navigate("/");
+    } catch (err) {
+      alert(err.response?.data?.error || "Mã OTP không hợp lệ hoặc đã hết hạn");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  // --- Giao diện OTP Step ---
+  // --- UI ---
+  if (otpStep) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <form
+          onSubmit={handleVerifyOtp}
+          className="bg-white p-6 rounded-2xl shadow-md w-80 text-center"
+        >
+          <h2 className="text-xl font-semibold mb-4">Xác minh OTP</h2>
+          <p className="text-sm text-gray-600 mb-3">
+            Mã OTP đã được gửi đến email <b>{email}</b>
+          </p>
+          <input
+            type="text"
+            placeholder="Nhập mã OTP"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+            maxLength={6}
+            className="w-full text-center border rounded-full px-3 py-2 mb-4 focus:border-slate-400 outline-none"
+            required
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-slate-900 text-white rounded-full py-2.5 font-semibold hover:bg-slate-800 disabled:opacity-60"
+          >
+            {loading ? "Đang xác minh..." : "Xác minh OTP"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setOtpStep(false)}
+            className="mt-3 text-sm text-gray-500 hover:underline"
+          >
+            Quay lại đăng nhập
+          </button>
+        </form>
+      </div>
+    );
+  }
+
+  // --- Giao diện Login/Register ---
   return (
     <div className="flex min-h-screen w-full bg-white">
       {/* LEFT IMAGE */}
@@ -77,48 +173,25 @@ export default function AuthPage() {
         <div className="w-full max-w-md p-8 mt-24">
           {/* Tabs */}
           <div className="flex justify-center gap-2">
-            <TabBtn active={tab === "login"} onClick={() => setTab("login")}>
+            <TabBtn active={tab === "login"} onClick={() => handleSwitchTab("login")}>
               Login
             </TabBtn>
-            <TabBtn
-              active={tab === "register"}
-              onClick={() => setTab("register")}
-            >
+            <TabBtn active={tab === "register"} onClick={() => handleSwitchTab("register")}>
               Register
             </TabBtn>
           </div>
 
-          <p className="mt-6 text-center text-xs leading-5 text-slate-500">
-            Lorem Ipsum dummy text
-          </p>
-
-          <form
-            ref={formRef}
-            onSubmit={handleSubmit}
-            className="mt-6 space-y-4 text-left"
-          >
-            {/* Email */}
+          <form ref={formRef} onSubmit={handleSubmit} className="mt-6 space-y-4 text-left">
             <Field label="Email Address">
-              <Input
-                name="email"
-                type="email"
-                placeholder="Enter your Email Address"
-                required
-              />
+              <Input name="email" type="email" placeholder="Enter your Email Address" required />
             </Field>
 
-            {/* Register thêm full name */}
             {tab === "register" && (
               <Field label="Full name">
-                <Input
-                  name="full_name"
-                  placeholder="Enter your Full name"
-                  required
-                />
+                <Input name="full_name" placeholder="Enter your Full name" required />
               </Field>
             )}
 
-            {/* Password */}
             <Field label="Password">
               <div className="relative">
                 <Input
@@ -138,7 +211,6 @@ export default function AuthPage() {
               </div>
             </Field>
 
-            {/* Role cho register */}
             {tab === "register" && (
               <Field label="Bạn là?">
                 <div className="flex gap-3">
@@ -165,38 +237,21 @@ export default function AuthPage() {
               </Field>
             )}
 
-            {/* Remember */}
-            {tab === "login" && (
-              <div className="flex items-center justify-between text-xs text-slate-500">
-                <label className="inline-flex items-center gap-2">
-                  <input type="checkbox" name="remember" className="h-4 w-4" />
-                  <span>Remember me</span>
-                </label>
-                <a href="#" className="hover:text-slate-700">
-                  Forgot Password?
-                </a>
-              </div>
-            )}
-
-            {/*  Google reCAPTCHA */}
+            {/* reCAPTCHA */}
             <div className="flex justify-start">
               <ReCAPTCHA
-                sitekey={"6LcPxeorAAAAAKBLAgBjCzxolgNj-iLcqW-xuqsu"}
+                ref={captchaRef}
+                sitekey="6LcPxeorAAAAAKBLAgBjCzxolgNj-iLcqW-xuqsu"
                 onChange={(token) => setCaptchaToken(token)}
               />
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
               className="cursor-pointer w-full rounded-full bg-slate-900 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-60"
             >
-              {loading
-                ? "Processing..."
-                : tab === "login"
-                  ? "Login"
-                  : "Register"}
+              {loading ? "Processing..." : tab === "login" ? "Login" : "Register"}
             </button>
 
             <div
@@ -213,7 +268,7 @@ export default function AuthPage() {
   );
 }
 
-/* ——— Small components ——— */
+/* Reusable Components */
 function TabBtn({ active, onClick, children }) {
   return (
     <button

@@ -1,8 +1,20 @@
-import { api } from "../../auth/api";
+import { api } from "../../auth/api"; // hoặc "../api" tùy vị trí file của bạn
 
 export const authApi = {
-    register: (data) => api.post("/auth/register", data),
-    login: (data) => api.post("/auth/login", data),
-    refresh: (refresh_token) => api.post("/auth/refresh", { refresh_token }),
-    logout: (refresh_token) => api.post("/auth/logout", { refresh_token })
+    // Đăng ký tài khoản mới
+    register: (data) => api.post("/api/auth/register", data),
+
+    // Đăng nhập (sẽ trả về step: VERIFY_OTP)
+    login: (data) => api.post("/api/auth/login", data),
+
+    // Xác minh mã OTP sau khi đăng nhập
+    verifyOtp: (data) => api.post("/api/auth/verify-otp", data),
+
+    // Làm mới token (refresh token)
+    refresh: (refresh_token) =>
+        api.post("/api/auth/refresh", { refresh_token }),
+
+    // Đăng xuất
+    logout: (refresh_token) =>
+        api.post("/api/auth/logout", { refresh_token }),
 };
