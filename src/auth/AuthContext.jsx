@@ -103,7 +103,7 @@ export function AuthProvider({ children }) {
 
   // ====== API: login / refresh / logout ======
   async function login({ email, password, captchaToken, access_token, refresh_token }) {
-    // ✅ Nếu đã có token (xác minh OTP xong)
+    //  Nếu đã có token (xác minh OTP xong)
     if (access_token && refresh_token) {
       setAccessToken(access_token);
       setRefreshToken(refresh_token);
@@ -111,7 +111,7 @@ export function AuthProvider({ children }) {
       return { access_token, refresh_token };
     }
 
-    // ✅ Nếu chưa có token (đăng nhập thường)
+    //  Nếu chưa có token (đăng nhập thường)
     const res = await api.post("/api/auth/login", { email, password, captchaToken });
 
     if (res.data?.step === "VERIFY_OTP") {

@@ -30,6 +30,13 @@ export default function AuthPage() {
     e.preventDefault();
     const formData = Object.fromEntries(new FormData(formRef.current));
 
+    // Validate đơn giản trước khi gửi
+    if (!formData.email || !formData.password) {
+      alert("Vui lòng nhập đầy đủ Email và Mật khẩu!");
+      return;
+    }
+
+    // Kiểm tra CAPTCHA
     if (!captchaToken) {
       alert("Vui lòng xác minh CAPTCHA trước khi tiếp tục.");
       return;
@@ -45,6 +52,7 @@ export default function AuthPage() {
           captchaToken,
         });
 
+        // Nếu bước OTP
         if (res.data?.step === "VERIFY_OTP") {
           setEmail(res.data.email);
           setOtpStep(true);
@@ -52,31 +60,43 @@ export default function AuthPage() {
           return;
         }
 
+        // ✅ Thành công
         alert("Đăng nhập thành công!");
         navigate("/");
       } else {
+        // REGISTER
         await authApi.register({
           ...formData,
           captchaToken,
         });
         alert("Đăng ký thành công! Vui lòng đăng nhập.");
         setTab("login");
-
-        //  reset CAPTCHA khi chuyển sang login
-        captchaRef.current?.reset();
+        captchaRef.current?.reset(); // reset CAPTCHA khi chuyển sang login
         setCaptchaToken(null);
       }
 
+      // ✅ Sau khi xử lý xong, reset form và CAPTCHA
       formRef.current?.reset();
-      captchaRef.current?.reset(); //  reset luôn sau khi submit thành công
+      captchaRef.current?.reset();
       setCaptchaToken(null);
     } catch (err) {
       console.error(err.response?.data || err.message);
-      alert(err.response?.data?.error || "Đã có lỗi xảy ra!");
+
+      // ⚠️ Nếu backend trả lỗi validate hoặc CAPTCHA
+      if (err.response?.data?.error?.includes("CAPTCHA")) {
+        alert("CAPTCHA không hợp lệ! Vui lòng xác minh lại.");
+        captchaRef.current?.reset(); // ✅ reset để người dùng tích lại
+        setCaptchaToken(null);
+      } else {
+        alert(err.response?.data?.error || "Đã có lỗi xảy ra!");
+        captchaRef.current?.reset(); // reset luôn để tránh token cũ
+        setCaptchaToken(null);
+      }
     } finally {
       setLoading(false);
     }
   };
+
 
   // --- Xác minh OTP ---
   const handleVerifyOtp = async (e) => {
