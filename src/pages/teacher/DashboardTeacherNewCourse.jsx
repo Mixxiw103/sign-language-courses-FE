@@ -5,7 +5,7 @@ import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useAuth } from "../../auth/AuthContext";
 import React, { useState } from "react";
-import { api, URL_BASE } from "../../auth/api";
+import { api, URL_BASE } from "../../utils/api";
 function Btn({ children, onClick, active }) {
   return (
     <button

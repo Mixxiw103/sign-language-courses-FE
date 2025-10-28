@@ -42,8 +42,8 @@ function App() {
   const location = useLocation();
 
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <AuthProvider>
+    <AuthProvider>
+      <AnimatePresence mode="wait" initial={false}>
         <Routes key={location.pathname} location={location}>
           <Route path="/" element={<DashboardMainLayout />}>
             <Route
@@ -181,8 +181,8 @@ function App() {
 
           {/* Teacher Screen */}
         </Routes>
-      </AuthProvider>
-    </AnimatePresence>
+      </AnimatePresence>
+    </AuthProvider>
   );
 }
 

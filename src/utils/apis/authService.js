@@ -1,4 +1,4 @@
-import { api } from "../../auth/api"; // hoặc "../api" tùy vị trí file của bạn
+import { api } from "../api";
 
 export const authApi = {
     // Đăng ký tài khoản mới

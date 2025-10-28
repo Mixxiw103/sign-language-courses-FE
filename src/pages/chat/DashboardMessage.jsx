@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { IoIosMore } from "react-icons/io";
 import { useAuth } from "../../auth/AuthContext";
-import { api } from "../../auth/api";
+import { api } from "../../utils/api";
 
 const users = [
   {

@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { api } from "./api";
+import { api } from "../utils/api";
 import { saveAuth, loadAuth, clearAuth } from "./storage";
 import { getUserFromAccessToken } from "./jwt";
 
@@ -165,7 +165,7 @@ export function AuthProvider({ children }) {
     () => ({
       user,
       accessToken,
-      refreshToken,
+      // refreshToken,
       isAuthenticated: !!accessToken,
       loading,
 

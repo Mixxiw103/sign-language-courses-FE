@@ -1,4 +1,5 @@
 /* 1) Import Tailwind trước */
+
 @import "tailwindcss";
 
 /* 2) Đưa reset vào layer base để không đè utilities */
@@ -57,9 +58,13 @@
 /* Nếu vẫn muốn hỗ trợ light mode theo prefers-color-scheme, 
    làm trong base hoặc dùng class 'dark' của Tailwind thay vì ép color background: */
 @layer base {
+
   @media (prefers-color-scheme: light) {
-    body { /* ví dụ nhẹ nhàng */
+    body { /* chừa sẵn nếu muốn */
       /* @apply bg-white text-slate-900; */
     }
   }
+  
 }
+
+

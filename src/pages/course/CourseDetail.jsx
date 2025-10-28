@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { api } from "../../auth/api"; // ✅ import api dùng chung có interceptor
+import { api } from "../../utils/api";
 
 export default function CourseDetail() {
   const { id } = useParams();
