@@ -1,8 +1,8 @@
 // src/api/courseService.js
-import api from "./api";
+import { api } from "../../auth/api";
 
 export const courseApi = {
-    list: (params) => api.get("/courses", { params }),
+    list: (params) => api.get("/api/courses", { params }),
     getById: (id) => api.get(`/courses/${id}`),
     create: (data) => api.post("/courses", data),
     update: (id, data) => api.patch(`/courses/${id}`, data),

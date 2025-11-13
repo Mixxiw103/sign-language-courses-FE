@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function Header() {
   const { user, logout } = useAuth();
-  console.log("Header user:", user);
+  // console.log("Header user:", user);
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useClickOutsideDebounce(() => setIsOpen(false), 200);

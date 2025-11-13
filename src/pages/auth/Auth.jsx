@@ -60,7 +60,7 @@ export default function AuthPage() {
           return;
         }
 
-        // ✅ Thành công
+        // n Thành công
         alert("Đăng nhập thành công!");
         navigate("/");
       } else {
@@ -75,14 +75,14 @@ export default function AuthPage() {
         setCaptchaToken(null);
       }
 
-      // ✅ Sau khi xử lý xong, reset form và CAPTCHA
+      //  Sau khi xử lý xong, reset form và CAPTCHA
       formRef.current?.reset();
       captchaRef.current?.reset();
       setCaptchaToken(null);
     } catch (err) {
       console.error(err.response?.data || err.message);
 
-      // ⚠️ Nếu backend trả lỗi validate hoặc CAPTCHA
+      //  Nếu backend trả lỗi validate hoặc CAPTCHA
       if (err.response?.data?.error?.includes("CAPTCHA")) {
         alert("CAPTCHA không hợp lệ! Vui lòng xác minh lại.");
         captchaRef.current?.reset(); // ✅ reset để người dùng tích lại
