@@ -6,12 +6,14 @@ import {
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { LuMessageCircle } from "react-icons/lu";
+import IncomingCallModal from "../call/IncomingCallModal";
 
 export default function DashboardTeacherLayout() {
   const location = useLocation();
 
   return (
     <div className="min-h-screen text-left bg-slate-100 text-slate-800">
+      <IncomingCallModal />
       <div className="grid grid-cols-12 min-h-screen">
         {/* Sidebar */}
         <aside className="col-span-12 md:col-span-3 lg:col-span-2 bg-white border-r border-slate-100 flex flex-col">

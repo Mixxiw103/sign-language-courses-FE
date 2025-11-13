@@ -5,6 +5,7 @@ import { useAuth } from "../../auth/AuthContext";
 import { api } from "../../utils/api";
 import { Link } from "react-router-dom";
 import { socket } from "../../utils/socket";
+import { useCall } from "../../call/CallContext";
 
 export default function DashboardMessage() {
   const { user, isAuthenticated } = useAuth();
@@ -28,16 +29,26 @@ export default function DashboardMessage() {
   const [partnerTyping, setPartnerTyping] = useState(false);
   const [onlineMap, setOnlineMap] = useState({});
 
+  // Video call
+  const { startCall } = useCall();
+
   // tiện ích: normalize ObjectId hoặc string
   const toId = (v) => (v == null ? "" : String(v));
   const eqId = (a, b) => toId(a) === toId(b);
 
   // cuộn cuối khi có tin mới
   const scrollToBottom = useCallback(() => {
-    if (listEndRef.current)
+    if (listEndRef.current) {
       listEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
   }, []);
-  useEffect(() => scrollToBottom(), [messages, scrollToBottom]);
+
+  useEffect(() => {
+    // chỉ scroll khi dữ liệu messages vừa load xong lần đầu
+    if (!loadingMessages && messages.length > 0) {
+      scrollToBottom();
+    }
+  }, [loadingMessages, messages.length, scrollToBottom]);
 
   // Đóng dropdown khi click ngoài
   useEffect(() => {
@@ -55,13 +66,13 @@ export default function DashboardMessage() {
     if (!isAuthenticated || !user?.id) return;
 
     socket.connect();
-    socket.emit("join", toId(user.id));
-    socket.emit("presence:online", toId(user.id));
+    socket.emit("join", user.id);
+    socket.emit("presence:online", user.id);
 
     const onConnect = () => console.log("Socket connected:", socket.id);
     const onDisconnect = () => {
       console.log("Socket disconnected");
-      socket.emit("presence:offline", toId(user.id));
+      socket.emit("presence:offline", user.id);
     };
 
     socket.on("connect", onConnect);
@@ -70,7 +81,7 @@ export default function DashboardMessage() {
     return () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
-      socket.emit("presence:offline", toId(user.id));
+      socket.emit("presence:offline", user.id);
       socket.disconnect();
     };
   }, [isAuthenticated, user?.id]);
@@ -176,6 +187,8 @@ export default function DashboardMessage() {
     socket.on("userOffline", (uid) =>
       setOnlineMap((m) => ({ ...m, [toId(uid)]: false }))
     );
+
+    socket.on('presence:list', (uids) => setOnlineMap(() => Object.fromEntries(uids.map(id => [String(id), true]))));
 
     return () => {
       socket.off("receiveMessage", onReceive);
@@ -425,8 +438,11 @@ export default function DashboardMessage() {
                     <button
                       onClick={() => {
                         setDropdownOpen(false);
-                        // TODO: mở modal call / chuyển route meeting
-                        alert("Bắt đầu Video Call (demo) — gắn SDK tuỳ nền tảng call bạn dùng");
+                        if (selectedConversation?.partner_id) {
+                          startCall(selectedConversation.partner_id);
+                        } else {
+                          alert("Hãy chọn người để gọi");
+                        }
                       }}
                       className="w-full text-left px-4 py-2 hover:bg-gray-100"
                       disabled={!selectedConversation}
