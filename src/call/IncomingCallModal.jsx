@@ -12,8 +12,6 @@ const getUserMeta = (userId) => {
 export default function IncomingCallModal() {
     const { incoming, acceptCall, declineCall } = useCall();
 
-    console.log("[IncomingCallModal] render, incoming =", incoming);
-
     if (!incoming) return null;
 
     const meta = getUserMeta(incoming.fromUserId);
