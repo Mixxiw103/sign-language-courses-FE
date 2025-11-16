@@ -37,6 +37,8 @@ import DashboardMessage from "./pages/chat/DashboardMessage";
 import { AuthProvider, useAuth } from "./auth/AuthContext";
 import CallProvider from "./call/CallContext";
 import { socket } from "./utils/socket";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // helper: lấy meta user cho modal gọi
 function useUserMetaResolver() {
@@ -202,6 +204,19 @@ export default function App() {
     <AuthProvider>
       <CallProvider>
         <AppRoutes />
+        {/* ToastContainer đặt ở root để dùng ở mọi nơi */}
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
       </CallProvider>
     </AuthProvider>
   );

@@ -1,7 +1,19 @@
 import {
-  Search, Bell, ShoppingCart, Package, Users, Boxes,
-  GraduationCap, BarChart3, Settings, LogOut, LayoutDashboard,
-  BookOpen, Calendar, FileText, House,
+  Search,
+  Bell,
+  ShoppingCart,
+  Package,
+  Users,
+  Boxes,
+  GraduationCap,
+  BarChart3,
+  Settings,
+  LogOut,
+  LayoutDashboard,
+  BookOpen,
+  Calendar,
+  FileText,
+  House,
 } from "lucide-react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
@@ -21,31 +33,60 @@ export default function DashboardStudentLayout() {
         <aside className="col-span-12 md:col-span-3 lg:col-span-2 bg-white border-r border-slate-100 flex flex-col">
           {/* Logo */}
           <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-100">
-            <div className="h-10 w-10 rounded-full bg-slate-800 text-white grid place-items-center font-bold">ST</div>
+            <div className="h-10 w-10 rounded-full bg-slate-800 text-white grid place-items-center font-bold">
+              ST
+            </div>
             <div>
-              <div className="font-semibold">{user.full_name}</div>
-              <div className="text-xs text-slate-500">Bảng điều khiển Học sinh</div>
+              <div className="font-semibold">{user?.full_name}</div>
+              <div className="text-xs text-slate-500">
+                Bảng điều khiển Học sinh
+              </div>
             </div>
           </div>
 
           {/* Nav */}
           <nav className="flex-1 p-4 space-y-1">
             {[
-              { to: "/", label: "Trang chủ", icon: <House className="h-5 w-5" /> },
-              { to: "/student", label: "Bảng điều khiển", icon: <LayoutDashboard className="h-5 w-5" /> },
-              { to: "/student/my-courses", label: "Khóa học của tôi", icon: <GraduationCap className="h-5 w-5" /> },
-              { to: "/student/assignments", label: "Bài tập", icon: <FileText className="h-5 w-5" /> },
-              { to: "/student/messages", label: "Tin nhắn", icon: <LuMessageCircle className="h-5 w-5" /> },
-              { to: "/student/settings", label: "Cài đặt", icon: <Settings className="h-5 w-5" /> },
+              {
+                to: "/",
+                label: "Trang chủ",
+                icon: <House className="h-5 w-5" />,
+              },
+              {
+                to: "/student",
+                label: "Bảng điều khiển",
+                icon: <LayoutDashboard className="h-5 w-5" />,
+              },
+              {
+                to: "/student/my-courses",
+                label: "Khóa học của tôi",
+                icon: <GraduationCap className="h-5 w-5" />,
+              },
+              {
+                to: "/student/assignments",
+                label: "Bài tập",
+                icon: <FileText className="h-5 w-5" />,
+              },
+              {
+                to: "/student/messages",
+                label: "Tin nhắn",
+                icon: <LuMessageCircle className="h-5 w-5" />,
+              },
+              {
+                to: "/student/settings",
+                label: "Cài đặt",
+                icon: <Settings className="h-5 w-5" />,
+              },
             ].map((item) => (
               <NavLink
                 key={item.label}
                 to={item.to}
                 end
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition ${isActive
-                    ? "bg-[#fff3f0] text-[#ff6636] font-semibold"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                  `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition ${
+                    isActive
+                      ? "bg-[#fff3f0] text-[#ff6636] font-semibold"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                   }`
                 }
               >
@@ -83,14 +124,20 @@ export default function DashboardStudentLayout() {
 
               <button className="relative h-10 w-10 rounded-full bg-white cursor-pointer grid place-items-center hover:shadow transition">
                 <Bell className="h-5 w-5 text-slate-600" />
-                <span className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1 rounded-full bg-rose-500 text-white text-[10px] grid place-items-center">3</span>
+                <span className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1 rounded-full bg-rose-500 text-white text-[10px] grid place-items-center">
+                  3
+                </span>
               </button>
 
               <div className="flex items-center gap-3">
-                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=80&auto=format&fit=crop" alt="avatar" className="h-9 w-9 rounded-full object-cover" />
+                <img
+                  src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=80&auto=format&fit=crop"
+                  alt="avatar"
+                  className="h-9 w-9 rounded-full object-cover"
+                />
                 <div className="hidden sm:block">
-                  <div className="text-sm font-medium">{user.full_name}</div>
-                  <div className="text-xs text-slate-500">{user.email}</div>
+                  <div className="text-sm font-medium">{user?.full_name}</div>
+                  <div className="text-xs text-slate-500">{user?.email}</div>
                 </div>
               </div>
             </div>
