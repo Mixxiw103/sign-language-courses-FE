@@ -13,7 +13,7 @@ import Page from "./components/Page";
 import DashboardHome from "./pages/admin/DashboardHome";
 import DashboardOrder from "./pages/admin/DashboardOrder";
 import DashboardProduct from "./pages/admin/DashboardProduct";
-import DashboardCustomer from "./pages/admin/DashboardCustomer";
+import DashboardUser from "./pages/admin/DashboardUser";
 import DashboardCourse from "./pages/admin/DashboardCourse";
 import DashboardReport from "./pages/admin/DashboardReport";
 import DashboardSetting from "./pages/profile/DashboardSetting";
@@ -156,7 +156,7 @@ function AppRoutes() {
           <Route path="home" element={<DashboardHome />} />
           <Route path="orders" element={<DashboardOrder />} />
           <Route path="products" element={<DashboardProduct />} />
-          <Route path="customers" element={<DashboardCustomer />} />
+          <Route path="users" element={<DashboardUser />} />
           <Route path="courses" element={<DashboardCourse />} />
           <Route path="reports" element={<DashboardReport />} />
           <Route path="settings" element={<DashboardSetting />} />

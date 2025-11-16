@@ -84,27 +84,31 @@ export default function Header() {
 
               {/* Dùng onMouseDown để tránh race với listener ngoài */}
               <button
-  onMouseDown={(e) => {
-    e.stopPropagation();
-    setIsOpen((v) => !v);
-  }}
-  aria-haspopup="menu"
-  aria-expanded={isOpen}
-  className="text-gray-700 font-medium flex items-center cursor-pointer select-none"
->
-  {user?.full_name || "User"}
-  <ChevronDown
-    className={`ml-1 h-4 w-4 transition-transform duration-200 ${
-      isOpen ? "rotate-180" : "rotate-0"
-    }`}
-  />
-</button>
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  setIsOpen((v) => !v);
+                }}
+                aria-haspopup="menu"
+                aria-expanded={isOpen}
+                className="text-gray-700 font-medium flex items-center cursor-pointer select-none"
+              >
+                {user?.full_name || "User"}
+                <ChevronDown
+                  className={`ml-1 h-4 w-4 transition-transform duration-200 ${
+                    isOpen ? "rotate-180" : "rotate-0"
+                  }`}
+                />
+              </button>
 
               {/* Dropdown */}
               <div
                 className={`absolute right-0 top-10 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10 origin-top-right
                   transition transform duration-150
-                  ${isOpen ? "opacity-100 scale-100" : "pointer-events-none opacity-0 scale-95"}`}
+                  ${
+                    isOpen
+                      ? "opacity-100 scale-100"
+                      : "pointer-events-none opacity-0 scale-95"
+                  }`}
                 role="menu"
               >
                 <button
@@ -144,13 +148,13 @@ export default function Header() {
             <>
               <Link
                 to="/auth"
-                className="px-4 py-2 rounded-3xl border border-cyan-500 text-cyan-500 hover:bg-cyan-50"
+                className="px-1 py-1.5 min-w-[115px] text-base rounded-3xl border border-cyan-500 text-cyan-500 hover:bg-cyan-50"
               >
                 <span className="text-md">Đăng nhập</span>
               </Link>
               <Link
                 to="/auth"
-                className="px-4 py-2 rounded-3xl border border-transparent bg-cyan-500 text-white hover:bg-cyan-600"
+                className="px-1 py-1.5 min-w-[115px] text-base rounded-3xl border border-transparent bg-cyan-500 text-white hover:bg-cyan-600"
               >
                 <span className="text-md">Đăng ký</span>
               </Link>

@@ -26,7 +26,7 @@ export default function DashboardTeacherLayout() {
       <IncomingCallModal />
       <div className="grid grid-cols-12 min-h-screen">
         {/* Sidebar */}
-        <aside className="col-span-12 md:col-span-3 lg:col-span-2 bg-white border-r border-slate-100 flex flex-col">
+        <aside className="fixed top-0 left-0 bottom-0  w-[240px] col-span-12 md:col-span-3 lg:col-span-2 bg-white border-r border-slate-100 flex flex-col">
           {/* Logo */}
           <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-100">
             <div className="h-10 w-10 rounded-full bg-slate-800 text-white grid place-items-center font-bold">
@@ -43,11 +43,6 @@ export default function DashboardTeacherLayout() {
           {/* Nav */}
           <nav className="flex-1 p-4 space-y-1">
             {[
-              {
-                to: "/",
-                label: "Trang chủ",
-                icon: <House className="h-5 w-5" />,
-              },
               {
                 to: "/teacher",
                 label: "Bảng điều khiển",
@@ -106,12 +101,9 @@ export default function DashboardTeacherLayout() {
         </aside>
 
         {/* Main */}
-        <main className="col-span-12 md:col-span-9 lg:col-span-10 bg-slate-100">
+        <main className="col-span-12 md:col-span-9 lg:col-span-10 bg-slate-100 mt-[64px] ml-[240px] w-full">
           {/* Topbar */}
-          <div
-            className="flex items-center bg-white
-           justify-between px-6 py-2"
-          >
+          <div className="flex items-center  ml-[240px] bg-white justify-between px-6 py-2 fixed h-[64px] top-0 right-0 left-0 ">
             <div>
               <div className="text-lg font-semibold">Bảng điều khiển</div>
               <div className="text-sm text-slate-500">Chào mừng trở lại!</div>
@@ -121,10 +113,17 @@ export default function DashboardTeacherLayout() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <input
-                  className="pl-9 pr-10 py-2 w-[280px] lg:w-[420px] rounded-full bg-white border border-slate-200 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+                  className="pl-9 pr-10 py-2 h-[38px] w-[280px] lg:w-[420px] rounded-full bg-white border border-slate-200 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
                   placeholder="Search..."
                 />
               </div>
+              <NavLink
+                to="/"
+                className="flex gap-2 items-center border border-[#e2e8f0] h-[38px] px-6 py-1 rounded-full"
+              >
+                <House className="size-4" />
+                Về trang chủ
+              </NavLink>
 
               <button className="relative h-10 w-10 rounded-full bg-white cursor-pointer grid place-items-center hover:shadow transition">
                 <Bell className="h-5 w-5 text-slate-600" />
@@ -150,17 +149,19 @@ export default function DashboardTeacherLayout() {
           </div>
 
           {/* Children với fade transition */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={location.pathname} // khi path đổi sẽ trigger animation
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Outlet />
-            </motion.div>
-          </AnimatePresence>
+          <div className="">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={location.pathname} // khi path đổi sẽ trigger animation
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Outlet />
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </main>
       </div>
     </div>

@@ -44,7 +44,7 @@ const customers = [
   },
 ];
 
-export default function DashboardCustomer() {
+export default function DashboardUser() {
   return (
     <div className="min-h-screen bg-[#fdf2e9] p-6">
       {/* Tiêu đề */}
@@ -90,7 +90,6 @@ export default function DashboardCustomer() {
                   </div>
                 </td>
 
-
                 {/* Contact */}
                 <td className="py-3 text-sm text-gray-600">
                   <div className="flex items-center gap-1.5 py-0.5">
@@ -103,7 +102,6 @@ export default function DashboardCustomer() {
                   </div>
                 </td>
 
-
                 {/* Orders */}
                 <td className="py-3">
                   <div className="flex items-center gap-2 whitespace-nowrap">
@@ -111,7 +109,6 @@ export default function DashboardCustomer() {
                     {c.orders} orders
                   </div>
                 </td>
-
 
                 {/* Last Order */}
                 <td className="py-3">
@@ -140,7 +137,6 @@ export default function DashboardCustomer() {
                     </button>
                   </div>
                 </td>
-
               </tr>
             ))}
           </tbody>

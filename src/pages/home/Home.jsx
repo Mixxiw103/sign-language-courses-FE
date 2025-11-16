@@ -116,7 +116,7 @@ export default function Home() {
           <img
             src={HomeIntroduceImg}
             alt="Ngôn ngữ ký hiệu"
-            className="w-full h-full object-cover rounded-lg"
+            className="w-full h-full object-cover"
           />
         </div>
       </div>

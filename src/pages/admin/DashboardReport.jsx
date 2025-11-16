@@ -1,4 +1,7 @@
-
 export default function DashboardReport() {
-  return <h2>DashboardReport Page</h2>
+  return (
+    <div className="w-full">
+      <h2>DashboardReport Page</h2>
+    </div>
+  );
 }
