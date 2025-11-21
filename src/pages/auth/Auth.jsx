@@ -4,6 +4,7 @@ import { IoMdEye, IoMdEyeOff, IoIosArrowRoundBack } from "react-icons/io";
 import { authApi } from "../../utils/apis/authService";
 import { useAuth } from "../../auth/AuthContext";
 import ReCAPTCHA from "react-google-recaptcha";
+import { toast } from "react-toastify";
 
 export default function AuthPage() {
   const { login } = useAuth();
@@ -30,15 +31,17 @@ export default function AuthPage() {
     e.preventDefault();
     const formData = Object.fromEntries(new FormData(formRef.current));
 
+    const selectedRole = formData.role;
+
     // Validate đơn giản trước khi gửi
     if (!formData.email || !formData.password) {
-      alert("Vui lòng nhập đầy đủ Email và Mật khẩu!");
+      toast.error("Vui lòng nhập đầy đủ Email và Mật khẩu!");
       return;
     }
 
     // Kiểm tra CAPTCHA
     if (!captchaToken) {
-      alert("Vui lòng xác minh CAPTCHA trước khi tiếp tục.");
+      toast.error("Vui lòng xác minh CAPTCHA trước khi tiếp tục.");
       return;
     }
 
@@ -56,20 +59,21 @@ export default function AuthPage() {
         if (res.data?.step === "VERIFY_OTP") {
           setEmail(res.data.email);
           setOtpStep(true);
-          alert("OTP đã được gửi đến email của bạn!");
+          toast.success("OTP đã được gửi đến email!");
           return;
         }
 
         // ✅ Thành công
-        alert("Đăng nhập thành công!");
+        toast.success("Đăng nhập thành công!");
         navigate("/");
       } else {
         // REGISTER
         await authApi.register({
           ...formData,
+          role: selectedRole,
           captchaToken,
         });
-        alert("Đăng ký thành công! Vui lòng đăng nhập.");
+        toast.success("Đăng ký thành công! Vui lòng đăng nhập.");
         setTab("login");
         captchaRef.current?.reset(); // reset CAPTCHA khi chuyển sang login
         setCaptchaToken(null);
@@ -84,11 +88,11 @@ export default function AuthPage() {
 
       // ⚠️ Nếu backend trả lỗi validate hoặc CAPTCHA
       if (err.response?.data?.error?.includes("CAPTCHA")) {
-        alert("CAPTCHA không hợp lệ! Vui lòng xác minh lại.");
+        toast.error("CAPTCHA không hợp lệ! Vui lòng xác minh lại.");
         captchaRef.current?.reset(); // ✅ reset để người dùng tích lại
         setCaptchaToken(null);
       } else {
-        alert(err.response?.data?.error || "Đã có lỗi xảy ra!");
+        toast.error(err.response?.data?.error || "Đã có lỗi xảy ra!");
         captchaRef.current?.reset(); // reset luôn để tránh token cũ
         setCaptchaToken(null);
       }
@@ -96,7 +100,6 @@ export default function AuthPage() {
       setLoading(false);
     }
   };
-
 
   // --- Xác minh OTP ---
   const handleVerifyOtp = async (e) => {
@@ -117,15 +120,16 @@ export default function AuthPage() {
         refresh_token: refresh,
       });
 
-      alert("Xác minh OTP thành công!");
+      toast.success("Xác minh OTP thành công!");
       navigate("/");
     } catch (err) {
-      alert(err.response?.data?.error || "Mã OTP không hợp lệ hoặc đã hết hạn");
+      toast.error(
+        err.response?.data?.error || "Mã OTP không hợp lệ hoặc đã hết hạn"
+      );
     } finally {
       setLoading(false);
     }
   };
-
 
   // --- Giao diện OTP Step ---
   // --- UI ---
@@ -193,22 +197,41 @@ export default function AuthPage() {
         <div className="w-full max-w-md p-8 mt-24">
           {/* Tabs */}
           <div className="flex justify-center gap-2">
-            <TabBtn active={tab === "login"} onClick={() => handleSwitchTab("login")}>
+            <TabBtn
+              active={tab === "login"}
+              onClick={() => handleSwitchTab("login")}
+            >
               Login
             </TabBtn>
-            <TabBtn active={tab === "register"} onClick={() => handleSwitchTab("register")}>
+            <TabBtn
+              active={tab === "register"}
+              onClick={() => handleSwitchTab("register")}
+            >
               Register
             </TabBtn>
           </div>
 
-          <form ref={formRef} onSubmit={handleSubmit} className="mt-6 space-y-4 text-left">
+          <form
+            ref={formRef}
+            onSubmit={handleSubmit}
+            className="mt-6 space-y-4 text-left"
+          >
             <Field label="Email Address">
-              <Input name="email" type="email" placeholder="Enter your Email Address" required />
+              <Input
+                name="email"
+                type="email"
+                placeholder="Enter your Email Address"
+                required
+              />
             </Field>
 
             {tab === "register" && (
               <Field label="Full name">
-                <Input name="full_name" placeholder="Enter your Full name" required />
+                <Input
+                  name="full_name"
+                  placeholder="Enter your Full name"
+                  required
+                />
               </Field>
             )}
 
@@ -238,7 +261,7 @@ export default function AuthPage() {
                     <input
                       type="radio"
                       name="role"
-                      value="giaovien"
+                      value="lecturer"
                       defaultChecked
                       className="h-4 w-4 accent-slate-900"
                     />
@@ -248,7 +271,7 @@ export default function AuthPage() {
                     <input
                       type="radio"
                       name="role"
-                      value="hocsinh"
+                      value="student"
                       className="h-4 w-4 accent-slate-900"
                     />
                     <span className="text-sm text-slate-700">Học sinh</span>
@@ -271,7 +294,11 @@ export default function AuthPage() {
               disabled={loading}
               className="cursor-pointer w-full rounded-full bg-slate-900 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-60"
             >
-              {loading ? "Processing..." : tab === "login" ? "Login" : "Register"}
+              {loading
+                ? "Processing..."
+                : tab === "login"
+                ? "Login"
+                : "Register"}
             </button>
 
             <div

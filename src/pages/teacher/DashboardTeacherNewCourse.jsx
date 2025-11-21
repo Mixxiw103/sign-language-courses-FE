@@ -425,7 +425,7 @@ export default function DashboardTeacherNewCourse() {
         course: {
           title: title.trim(),
           description: descHtml,
-          lecturer_id: "690069af9308110a97d22027", // hoặc lấy từ context
+          lecturer_id: user.id, // hoặc lấy từ context
           price: Number(price),
           status: "published",
         },
