@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+<<<<<<< HEAD
 import { api } from "../../auth/api";
 import CourseTreeSidebar from "../../components/CourseTreeSidebar"; // 👈 import component mới
+=======
+import { api } from "../../utils/api";
+>>>>>>> da34e787d858c11122626d09f6744c0e07e0ec78
 
 export default function CourseDetail() {
   const { id } = useParams();

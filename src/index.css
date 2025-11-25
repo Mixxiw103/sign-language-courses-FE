@@ -1,17 +1,29 @@
 /* 1) Import Tailwind trước */
+
 @import "tailwindcss";
 
 /* 2) Đưa reset vào layer base để không đè utilities */
 @layer base {
-  .tiptap ul { list-style: disc; padding-left: 1.25rem; }
-  .tiptap ol { list-style: decimal; padding-left: 1.25rem; }
-  .tiptap li { margin: 0.25rem 0; }
-  *, *::before, *::after {
+  .tiptap ul {
+    list-style: disc;
+    padding-left: 1.25rem;
+  }
+  .tiptap ol {
+    list-style: decimal;
+    padding-left: 1.25rem;
+  }
+  .tiptap li {
+    margin: 0.25rem 0;
+  }
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
 
     /* Transition mượt cho các thuộc tính nhẹ */
     transition-property: color, background-color, border-color,
-      text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter;
+      text-decoration-color, fill, stroke, opacity, box-shadow, transform,
+      filter;
     transition-duration: 200ms;
     transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
@@ -38,7 +50,15 @@
   /* body { @apply bg-white text-slate-900; } */
 
   /* Headings không ép size để utility text-* hoạt động đúng */
-  h1,h2,h3,h4,h5,h6 { font-size: inherit; font-weight: inherit; }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: inherit;
+    font-weight: inherit;
+  }
 }
 
 .tiptap p.is-editor-empty:first-child::before {
@@ -58,8 +78,13 @@
    làm trong base hoặc dùng class 'dark' của Tailwind thay vì ép color background: */
 @layer base {
   @media (prefers-color-scheme: light) {
-    body { /* ví dụ nhẹ nhàng */
+    body {
+      /* chừa sẵn nếu muốn */
       /* @apply bg-white text-slate-900; */
     }
   }
+}
+
+.Toastify__toast-container {
+  margin-top: 60px !important;
 }

@@ -1,9 +1,4 @@
-import {
-  ShoppingCart,
-  Package,
-  Users,
-  BadgeDollarSign,
-} from "lucide-react";
+import { ShoppingCart, Package, Users, BadgeDollarSign } from "lucide-react";
 import {
   LineChart,
   Line,
@@ -73,9 +68,9 @@ const StatusBadge = ({ status }) => {
 
 export default function DashboardHome() {
   return (
-    <div className="px-6 pb-8">
+    <div className="px-6 pb-8 w-full">
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mt-5">
         <StatCard
           label="Orders Today"
           value={24}

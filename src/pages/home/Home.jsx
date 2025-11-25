@@ -1,12 +1,51 @@
 import { useState } from "react";
-import Header from "../../components/HeaderP";
 import { Link } from "react-router-dom";
 import HomeIntroduceImg from "../../assets/Home_introduce.png";
 import CourseCard from "../../components/CourseCard";
-import { ArrowRight } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarCheck,
+  FileSpreadsheet,
+  Users,
+} from "lucide-react";
 import Footer from "../../components/Footer";
 import { useAuth } from "../../auth/AuthContext";
 
+const Badge = ({ value = "", title = "" }) => {
+  return (
+    <div className="bg-white p-4 rounded-lg shadow flex justify-center flex-col items-center">
+      <div
+        className={[
+          "flex items-baseline gap-[0.15em]",
+          "font-sans tracking-[-0.02em] select-none text-3xl",
+        ].join(" ")}
+      >
+        <span
+          className={[
+            "tabular-nums leading-none",
+            "bg-gradient-to-r from-sky-600 via-sky-600 to-teal-400",
+            "bg-clip-text text-transparent",
+            "font-medium",
+          ].join(" ")}
+        >
+          {value}
+        </span>
+      </div>
+      <span className="text-gray-600 mt-2 ">{title}</span>
+    </div>
+  );
+};
+const BaseBadge = ({ title = "", desc = "", icon }) => {
+  return (
+    <div className=" relative bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 text-center">
+      {icon}
+      <div className="p-8 mt-10">
+        <h3 className="text-xl font-semibold text-slate-800 mb-3">{title}</h3>
+        <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
+      </div>
+    </div>
+  );
+};
 export default function Home() {
   const { user } = useAuth();
   console.log("user: ", user);
@@ -27,7 +66,7 @@ export default function Home() {
   return (
     <div>
       {/* Text and Image Section */}
-      <div className="w-full flex flex-row mb-12">
+      <div className="w-full flex flex-row mb-20">
         {/* Text */}
         <div className="basis-2/5 min-h-[300px] flex flex-col justify-center items-start bg-cyan-500 p-6 space-y-4 text-left">
           <h1 className="text-2xl text-white">
@@ -77,135 +116,98 @@ export default function Home() {
           <img
             src={HomeIntroduceImg}
             alt="Ngôn ngữ ký hiệu"
-            className="w-full h-full object-cover rounded-lg"
+            className="w-full h-full object-cover"
           />
         </div>
       </div>
 
       {/* Success Section */}
-      <section className="text-center mb-12 w-full">
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">
+      <section className="text-center mb-20 w-full">
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">
           Những thành tựu của chúng tôi
         </h2>
-        <p className="text-gray-500 mb-6">
+        <p className="text-gray-500 mb-6 mx-64">
           Sau 15 năm hoạt động, chúng tôi đã đạt được nhiều thành tựu đáng quý,
           hãy cùng nhìn lại những con số sau.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 text-center">
-          <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-3xl font-bold text-blue-600">XXX</h3>
-            <p className="text-gray-600">Học viên</p>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-3xl font-bold text-blue-600">XXX</h3>
-            <p className="text-gray-600">Khoá học</p>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-3xl font-bold text-blue-600">XXX</h3>
-            <p className="text-gray-600">Đã tốt nghiệp</p>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-3xl font-bold text-blue-600">XXX</h3>
-            <p className="text-gray-600">Giáo viên</p>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-3xl font-bold text-blue-600">XXX</h3>
-            <p className="text-gray-600">Năm hoạt động</p>
-          </div>
+          <Badge value="15k+" title="Học sinh" />
+          <Badge value="75%" title="Khóa học" />
+          <Badge value="35" title="Đã tốt nghiệp" />
+          <Badge value="26" title="Giáo viên" />
+          <Badge value="1" title="Năm hoạt động" />
         </div>
       </section>
 
       {/* Nền tảng học NNKH trực tuyến Section */}
-      <section className="text-center mb-12 w-full">
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">
+      <section className="text-center mb-20 w-full">
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">
           Nền tảng học NNKH trực tuyến.
         </h2>
-        <p className="text-gray-500 mb-6">
+        <p className="text-gray-500 mb-6 mx-64">
           Chúng tôi có tất cả các khoá học online từ trình độ cho người mới bắt
           đầu tới đào tạo mức phiên dịch viên.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="w-12 h-12 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-              <svg
-                className="w-6 h-6 text-blue-600"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6zm2 2a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm0 4a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-800">
-              Các bài giảng trực tuyến
-            </h3>
-            <p className="text-gray-600 mt-2">
-              Đa dạng các bài giảng, bạn có thể chọn giáo viên ưa thích, chọn
-              khoá học phù hợp với bản thân mình
-            </p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="w-12 h-12 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
-              <svg
-                className="w-6 h-6 text-green-600"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 10H9v-2h2v2zm0-4H9V6h2v2z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-800">
-              Học NNKH chưa bao giờ dễ đến vậy
-            </h3>
-            <p className="text-gray-600 mt-2">
-              Sau khi mua khoá học, bạn có thể học mọi lúc, mọi nơi, trên mọi
-              thiết bị.
-            </p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="w-12 h-12 mx-auto mb-4 bg-purple-100 rounded-full flex items-center justify-center">
-              <svg
-                className="w-6 h-6 text-purple-600"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zm-2 10a2 2 0 10-4 0 2 2 0 004 0zm6-6a6 6 0 11-12 0 6 6 0 0112 0z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-800">
-              Đánh giá trình độ
-            </h3>
-            <p className="text-gray-600 mt-2">
-              Sau khi học xong mỗi bài học, các bạn có thể làm bài quiz nhỏ để
-              đánh giá khả năng.
-            </p>
+        <div className="py-16 px-6 md:px-12 lg:px-20">
+          <div className="grid gap-10 md:grid-cols-3">
+            <BaseBadge
+              title="Các bài giảng trực tuyến"
+              desc="Đa dạng các bài giảng, bạn có thể chọn giáo viên ưa thích, chọn
+              khoá học phù hợp với bản thân mình"
+              icon={
+                <div className="mx-auto absolute -top-8 left-1/2 -translate-x-1/2 w-16 h-16 bg-sky-500 rounded-full flex items-center justify-center mb-6 shadow-lg">
+                  <FileSpreadsheet className="w-8 h-8 text-white" />
+                </div>
+              }
+            />
+            <BaseBadge
+              title="Học NNKH chưa bao giờ dễ đến vậy"
+              desc="Sau khi mua khoá học, bạn có thể học mọi lúc, mọi nơi, trên mọi
+              thiết bị."
+              icon={
+                <div className="mx-auto absolute -top-8 left-1/2 -translate-x-1/2  w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center mb-6 shadow-lg">
+                  <CalendarCheck className="w-8 h-8 text-white" />
+                </div>
+              }
+            />
+            <BaseBadge
+              title="Đánh giá trình độ"
+              desc="Sau khi học xong mỗi bài học, các bạn có thể làm bài quiz nhỏ để
+              đánh giá khả năng."
+              icon={
+                <div className="mx-auto absolute -top-8 left-1/2 -translate-x-1/2  w-16 h-16 bg-cyan-500 rounded-full flex items-center justify-center mb-6 shadow-lg">
+                  <Users className="w-8 h-8 text-white" />
+                </div>
+              }
+            />
           </div>
         </div>
       </section>
 
       {/* Introduce Section */}
-      <section className="text-center mb-12 w-full">
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">
+      <section className="text-center mb-20 w-full">
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">
           Ngôn ngữ kí hiệu là gì?
         </h2>
-        <p className="text-gray-500 mb-6">
+        <p className="text-gray-500 mb-6 mx-64">
           Ngôn ngữ kí hiệu (NNKH) là một ngôn ngữ của người Điếc và khiếm thính,
           dùng để giao tiếp hằng ngày. Ngày nay, với khoảng 3 triệu người Điếc,
           trong đó chỉ có khoảng 7 phiên dịch NNKH chuyên nghiệp, chúng tôi hi
           vọng rằng các bạn có thể trở thành người tiếp theo.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 text-center px-10 mb-5 justify-items-center">
-          <div className="bg-white p-4 rounded-lg shadow w-full md:w-4/5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 text-center px-48 mb-10 justify-items-center">
+          <div className="bg-white p-4 rounded-lg shadow w-full py-8 md:w-4/5">
             <h3 className="text-3xl font-bold text-blue-600">3.000.000</h3>
             <p className="text-gray-600"> người Điếc</p>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow w-full md:w-4/5">
+          <div className="bg-white p-4 rounded-lg shadow w-full py-8 md:w-4/5">
             <h3 className="text-3xl font-bold text-blue-600">7</h3>
             <p className="text-gray-600">Phiên dịch chuyên nghiệp</p>
           </div>
         </div>
 
         {/* Teacher and Student Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 text-center px-10 place-items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 text-center px-48 place-items-center">
           <div
             className="bg-cover bg-center p-4 rounded-lg shadow w-full md:w-full h-75 flex flex-col justify-center"
             style={{
@@ -232,9 +234,9 @@ export default function Home() {
       </section>
 
       {/* Explore course Section */}
-      <section className="text-center mb-12 w-full">
+      <section className="text-center mb-20 w-ful px-10">
         <div>
-          <h2 className="text-3xl font-bold text-slate-800">
+          <h2 className="text-2xl font-bold text-slate-800">
             Khám phá các khoá học của chúng mình
           </h2>
         </div>
@@ -245,28 +247,7 @@ export default function Home() {
           </button>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-md p-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-5">
-          <CourseCard c={sampleCourse} />
-
-          <div className="space-y-4 text-left">
-            <h2 className="text-3xl font-bold text-slate-800">
-              Khoá học nhập môn
-            </h2>
-            <p className="text-gray-700 leading-relaxed">
-              Khoá học nhập môn NNKH sẽ cung cấp cho các bạn các từ vựng đơn
-              giản về 7 chủ đề xoay quanh cuộc sống hàng ngày. Làm quen với bảng
-              chữ cái, số đếm và ngữ pháp NNKH cũng sẽ được giới thiệu qua trong
-              phần này.
-            </p>
-            <button className="mt-4 px-6 py-2 rounded-full bg-cyan-500 text-white font-medium hover:bg-cyan-600 transition">
-              Mua ngay
-            </button>
-            <button className="ml-2 mt-4 px-6 py-2 rounded-full bg-gray-200 text-cyan-500 font-medium hover:bg-white transition">
-              Xem tất cả khoá nhập môn
-            </button>
-          </div>
-        </div>
-
+        {/* <div className="px-10"> */}
         <div className="bg-white rounded-2xl shadow-md p-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-5">
           <div className="space-y-4 text-left">
             <h2 className="text-3xl font-bold text-slate-800">
@@ -337,10 +318,11 @@ export default function Home() {
 
           <CourseCard c={sampleCourse} />
         </div>
+        {/* </div> */}
       </section>
 
       {/* Teacher Section */}
-      <section className="flex flex-col items-center justify-center min-h-screen p-6 text-center mb-12 w-full">
+      <section className="flex flex-col items-center justify-center min-h-screen p-6 text-center mb-20 w-full">
         <div className="text-center">
           <h1 className="text-5xl font-bold text-gray-800 mb-4">
             Bạn là người Điếc
@@ -418,7 +400,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-between w-full max-w-5xl mb-12">
+        <div className="flex items-center justify-between w-full max-w-5xl mb-20">
           <div className="w-1/2 pr-6">
             <h2 className="text-3xl font-bold text-gray-800 mb-4">
               Quy định khi làm giáo viên

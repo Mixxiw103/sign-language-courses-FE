@@ -4,8 +4,10 @@ import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useAuth } from "../../auth/AuthContext";
-import React, { useState } from "react";
-import { api, URL_BASE } from "../../auth/api";
+import { useState } from "react";
+import { api, URL_BASE } from "../../utils/api";
+import { toast } from "react-toastify";
+import { Eye, Trash } from "lucide-react";
 function Btn({ children, onClick, active }) {
   return (
     <button
@@ -20,11 +22,10 @@ function Btn({ children, onClick, active }) {
 }
 export default function DashboardTeacherNewCourse() {
   const { user } = useAuth();
+  const [previewItem, setPreviewItem] = useState(null);
   const TABS = [
-    { key: "basic", label: "Thông tin cơ bản", icon: IconLayers },
-    { key: "advance", label: "Thông tin nâng cao", icon: IconChecklist },
+    { key: "basic", label: "Thông tin khóa học", icon: IconLayers },
     { key: "curriculum", label: "Chương trình học", icon: IconPlaySquare },
-    { key: "publish", label: "Đăng tải khóa học", icon: IconRocket },
   ];
   const LANGS = [
     "Chọn...",
@@ -139,13 +140,6 @@ export default function DashboardTeacherNewCourse() {
   const next = () => setTab((t) => Math.min(t + 1, 3));
   const prev = () => setTab((t) => Math.max(t - 1, 0));
 
-  const basicValid =
-    title.trim().length > 0 &&
-    category !== "Chọn..." &&
-    courseLang !== "Chọn..." &&
-    level !== "Chọn..." &&
-    durationVal !== "";
-
   const onPickThumb = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -200,27 +194,6 @@ export default function DashboardTeacherNewCourse() {
     }
   };
 
-  const addListItem = (which) => {
-    const map = { teaches, audience, requirements };
-    if (map[which].length >= 8) return;
-    const n = [...map[which], ""];
-    ({
-      teaches: setTeaches,
-      audience: setAudience,
-      requirements: setRequirements,
-    })[which](n);
-  };
-  const updateListItem = (which, idx, v) => {
-    const map = { teaches, audience, requirements };
-    const n = [...map[which]];
-    n[idx] = v;
-    ({
-      teaches: setTeaches,
-      audience: setAudience,
-      requirements: setRequirements,
-    })[which](n);
-  };
-
   const addSection = () =>
     setSections((s) => [
       ...s,
@@ -265,23 +238,6 @@ export default function DashboardTeacherNewCourse() {
           : sec
       )
     );
-  const toggleLectureMenu = (sid, lid) =>
-    setSections((s) =>
-      s.map((sec) =>
-        sec.id === sid
-          ? {
-              ...sec,
-              lectures: sec.lectures.map((l) =>
-                l.id === lid ? { ...l, menuOpen: !l.menuOpen } : l
-              ),
-            }
-          : sec
-      )
-    );
-
-  const removeInstructor = (id) =>
-    setInstructors((arr) => arr.filter((x) => x.id !== id));
-
   // Khởi tạo editor
   const editor = useEditor({
     extensions: [
@@ -297,13 +253,149 @@ export default function DashboardTeacherNewCourse() {
       setDescHtml(editor.getHTML());
     },
   });
-  const [uploading, setUploading] = React.useState(false);
+  const [uploading, setUploading] = useState(false);
+  const addDocumentToLecture = (lectureId, doc) => {
+    setSections((prev) =>
+      prev.map((sec) => ({
+        ...sec,
+        lectures: sec.lectures.map((lec) =>
+          lec.id === lectureId
+            ? { ...lec, documents: [...(lec.documents || []), doc] }
+            : lec
+        ),
+      }))
+    );
+  };
+
+  // Xóa document theo index
+  const removeDocumentFromLecture = (lectureId, docIndex) => {
+    setSections((prev) =>
+      prev.map((sec) => ({
+        ...sec,
+        lectures: sec.lectures.map((lec) =>
+          lec.id === lectureId
+            ? {
+                ...lec,
+                documents: (lec.documents || []).filter(
+                  (_, i) => i !== docIndex
+                ),
+              }
+            : lec
+        ),
+      }))
+    );
+  };
+
+  // Upload document file và thêm vào lecture.documents
+  const handleDocumentUpload = async (lecId, file) => {
+    if (!file) return;
+    const fd = new FormData();
+    // bạn có thể thêm folder theo user: `courses/docs/${user.id}`
+    fd.append("folder", `courses/documents/${user?.id || ""}`);
+    fd.append("file", file);
+
+    try {
+      setUploading(true);
+      const res = await api.post("/api/uploads", fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      const { url } = res.data;
+      console.log(url, file.name);
+      // lưu tên gốc file và url
+      const doc = { name: file.name, url };
+      addDocumentToLecture(lecId, doc);
+      toast.success("Upload tài liệu thành công");
+    } catch (err) {
+      console.error("Upload document failed", err);
+      toast.error("Tải tài liệu thất bại");
+    } finally {
+      setUploading(false);
+    }
+  };
+  // state để biết item nào đang xóa (lectureId hoặc doc key)
+  const [deletingId, setDeletingId] = useState(null);
+
+  // Xóa video của lecture -> gọi DELETE /api/uploads?url=...
+  const deleteVideoFromLecture = async (lecId) => {
+    if (!confirm("Bạn có chắc muốn xóa video này?")) return;
+
+    const lec = sections.flatMap((s) => s.lectures).find((l) => l.id === lecId);
+    const rawUrl = lec?.videoUrl;
+    if (!rawUrl) {
+      toast.error("Không tìm thấy video để xóa");
+      return;
+    }
+    const fullUrl = rawUrl.startsWith("http") ? rawUrl : `${URL_BASE}${rawUrl}`;
+
+    try {
+      setDeletingId(`video-${lecId}`);
+      setUploading(true);
+      await api.delete("/api/uploads", { params: { url: fullUrl } });
+      // xóa local state
+      updateLectureVideoUrl(lecId, "");
+      toast.success("Xóa video thành công");
+    } catch (err) {
+      const status = err?.response?.status;
+      if (status === 404) {
+        updateLectureVideoUrl(lecId, "");
+        toast.warning("File không tồn tại trên server — đã xóa cục bộ");
+      } else {
+        console.error("deleteVideo error:", err);
+        toast.error("Xóa video thất bại. Vui lòng thử lại.");
+      }
+    } finally {
+      setUploading(false);
+      setDeletingId(null);
+    }
+  };
+
+  // Xóa document theo lectureId + index -> gọi DELETE /api/uploads?url=...
+  const deleteDocumentFromLecture = async (lectureId, docIndex) => {
+    if (!confirm("Bạn có chắc muốn xóa tài liệu này?")) return;
+
+    const lec = sections
+      .flatMap((s) => s.lectures)
+      .find((l) => l.id === lectureId);
+    const doc = lec?.documents?.[docIndex];
+    if (!doc) {
+      toast.error("Không tìm thấy tài liệu để xóa");
+      return;
+    }
+    const fullUrl = doc.url?.startsWith("http")
+      ? doc.url
+      : `${URL_BASE}${doc.url}`;
+
+    try {
+      setDeletingId(`doc-${lectureId}-${docIndex}`);
+      setUploading(true);
+      await api.delete("/api/uploads", { params: { url: fullUrl } });
+      // xóa local
+      removeDocumentFromLecture(lectureId, docIndex);
+      toast.success("Xóa tài liệu thành công");
+    } catch (err) {
+      const status = err?.response?.status;
+      if (status === 404) {
+        removeDocumentFromLecture(lectureId, docIndex);
+        toast.warning("File không tồn tại trên server — đã xóa cục bộ");
+      } else {
+        console.error("deleteDocument error:", err);
+        toast.error("Xóa tài liệu thất bại. Vui lòng thử lại.");
+      }
+    } finally {
+      setUploading(false);
+      setDeletingId(null);
+    }
+  };
 
   const handleVideoUpload = async (lecId, file, lecVideoUrl) => {
     if (!file) return;
 
     const fd = new FormData();
-    fd.append("folder", `courses/videos/${user.id}`);
+    fd.append(
+      "folder",
+      // `courses/videos/${user.id ? user.id : "690069af9308110a97d22027"}`
+      `courses/videos/`
+    );
     fd.append("file", file); // tên "video" trùng với field backend nhận
 
     try {
@@ -313,15 +405,15 @@ export default function DashboardTeacherNewCourse() {
       //   body: fd,
       // });
       const res = await api.post("/api/uploads", fd);
-
+      console.log("res", res);
       const { url } = res.data;
       updateLectureVideoUrl(lecId, url);
-      alert("upload successfully!");
+      toast.success("Tải video lên thành công!");
 
       // nếu muốn: cập nhật lại state sections ở đây
     } catch (err) {
       console.error(err);
-      alert("Tải video thất bại!");
+      toast.error("Tải video thất bại!");
     } finally {
       setUploading(false);
     }
@@ -355,12 +447,12 @@ export default function DashboardTeacherNewCourse() {
       const res = await api.post("/api/courses/create-structure", payload);
 
       if (res.status === 200 || res.status === 201) {
-        alert("Tạo khóa học thành công!");
+        toast.success("Tạo khóa học thành công!");
         console.log("Server trả về:", res.data);
       }
     } catch (err) {
       console.error("Lỗi gửi khóa học:", err.response?.data || err.message);
-      alert("Gửi dữ liệu thất bại!");
+      toast.error("Gửi dữ liệu thất bại!");
     }
   };
 
@@ -375,7 +467,7 @@ export default function DashboardTeacherNewCourse() {
               <button
                 key={t.key}
                 onClick={() => setTab(i)}
-                className={`flex items-center gap-2 border-b-2 px-2 py-3 text-sm font-medium ${
+                className={`flex items-center cursor-pointer gap-2 border-b-2 px-2 py-3 text-sm font-medium ${
                   tab === i
                     ? "border-orange-500 text-slate-900"
                     : "border-transparent text-slate-500 hover:text-slate-700"
@@ -418,7 +510,7 @@ export default function DashboardTeacherNewCourse() {
 
               <div className="mb-5">
                 <label className="mb-1 block text-sm font-medium text-slate-700">
-                  Tiêu đề
+                  Tiêu đề <span className="text-red-600">*</span>
                 </label>
                 <input
                   value={title}
@@ -432,7 +524,7 @@ export default function DashboardTeacherNewCourse() {
               </div>
               <div className="mb-5">
                 <label className="mb-1 block text-sm font-medium text-slate-700">
-                  Giá
+                  Giá <span className="text-red-600">*</span>
                 </label>
                 <input
                   type="number"
@@ -445,305 +537,147 @@ export default function DashboardTeacherNewCourse() {
                   {subtitle.length}/120
                 </div> */}
               </div>
-              {/* 
-              <div className="mb-5">
-                <label className="mb-1 block text-sm font-medium text-slate-700">
-                  Tiêu đề phụ
-                </label>
-                <input
-                  value={subtitle}
-                  onChange={(e) => setSubtitle(e.target.value.slice(0, 120))}
-                  placeholder="Tiêu đề phụ khóa học"
-                  className="w-full rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] px-3 py-2 text-sm"
-                />
-                <div className="mt-1 text-right text-xs text-slate-400">
-                  {subtitle.length}/120
-                </div>
-              </div>
+              {
+                <div>
+                  <h2 className="mt-12 mb-6 text-xl font-semibold text-slate-900">
+                    Thông tin nâng cao
+                  </h2>
 
-              <div className="mb-5 grid gap-5 md:grid-cols-2">
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
-                    Danh mục
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value)}
-                      className="w-full appearance-none rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] bg-white px-3 py-2 text-sm"
-                    >
-                      <option>Chọn...</option>
-                      <option>Thiết kế</option>
-                      <option>Lập trình</option>
-                      <option>Nâng cao</option>
-                      <option>Quảng cáo</option>
-                    </select>
-                    <IconChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  </div>
-                </div>
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
-                    Danh mục phụ
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={subcategory}
-                      onChange={(e) => setSubcategory(e.target.value)}
-                      className="w-full appearance-none rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] bg-white px-3 py-2 text-sm"
-                    >
-                      <option>Chọn...</option>
-                      <option>UI/UX</option>
-                      <option>Frontend</option>
-                      <option>Backend</option>
-                    </select>
-                    <IconChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  </div>
-                </div>
-              </div>
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] p-4">
+                      <div className="mb-2 text-sm font-medium">
+                        Hình thu nhỏ của khóa học
+                      </div>
+                      <p className="text-xs text-slate-500">
+                        Tải hình thu nhỏ của khóa học lên đây.{" "}
+                        <span className="font-medium">
+                          Hướng dẫn quan trọng:
+                        </span>{" "}
+                        1200×800 pixel hoặc Tỷ lệ 12:8. Định dạng được hỗ trợ:{" "}
+                        <b>jpg, jpeg, or png</b>.
+                      </p>
+                      <label className="mt-3 block cursor-pointer rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] bg-slate-50 px-3 py-2 text-sm text-orange-600 hover:bg-slate-100">
+                        <span className="inline-flex items-center gap-2">
+                          <IconUpload className="h-4 w-4" /> Tải hình ảnh lên
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={onPickThumb}
+                          className="hidden"
+                        />
+                      </label>
+                      {thumbUrl && (
+                        <img
+                          src={URL_BASE + thumbUrl}
+                          className="mt-3 h-28 rounded-md object-cover"
+                        />
+                      )}
+                    </div>
 
-              <div className="mb-5">
-                <label className="mb-1 block text-sm font-medium text-slate-700">
-                  Tiêu đề khóa học
-                </label>
-                <input
-                  value={topic}
-                  onChange={(e) => setTopic(e.target.value)}
-                  placeholder="Khóa học của bạn chủ yếu dạy những gì?"
-                  className="w-full rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] px-3 py-2 text-sm"
-                />
-              </div>
-
-              <div className="grid gap-5 md:grid-cols-4">
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
-                    Ngôn ngữ của khóa học
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={courseLang}
-                      onChange={(e) => setCourseLang(e.target.value)}
-                      className="w-full appearance-none rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] bg-white px-3 py-2 text-sm"
-                    >
-                      {LANGS.map((l) => (
-                        <option key={l}>{l}</option>
-                      ))}
-                    </select>
-                    <IconChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  </div>
-                </div>
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
-                    Phụ đề (Tùy chọn)
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={subLang}
-                      onChange={(e) => setSubLang(e.target.value)}
-                      className="w-full appearance-none rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] bg-white px-3 py-2 text-sm"
-                    >
-                      {LANGS.map((l) => (
-                        <option key={l}>{l}</option>
-                      ))}
-                    </select>
-                    <IconChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  </div>
-                </div>
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
-                    Mức độ yêu cầu
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={level}
-                      onChange={(e) => setLevel(e.target.value)}
-                      className="w-full appearance-none rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] bg-white px-3 py-2 text-sm"
-                    >
-                      {LEVELS.map((l) => (
-                        <option key={l}>{l}</option>
-                      ))}
-                    </select>
-                    <IconChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  </div>
-                </div>
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
-                    Khoảng thời gian khóa học
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="number"
-                      min={0}
-                      value={durationVal}
-                      onChange={(e) => setDurationVal(e.target.value)}
-                      placeholder="Thời gian"
-                      className="w-full rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] px-3 py-2 text-sm"
-                    />
-                    <div className="relative px-1">
-                      <select
-                        value={durationUnit}
-                        onChange={(e) => setDurationUnit(e.target.value)}
-                        className="appearance-none rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] bg-white px-3 py-2 text-sm"
-                      >
-                        {DURATION_UNITS.map((u) => (
-                          <option key={u}>{u}</option>
-                        ))}
-                      </select>
-                      <IconChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <div className="rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] p-4">
+                      <div className="mb-2 text-sm font-medium">
+                        Đoạn giới thiệu khóa học
+                      </div>
+                      <p className="text-xs text-slate-500">
+                        Những sinh viên xem video quảng cáo được làm tốt có khả
+                        năng đăng ký khóa học của bạn cao hơn 5 lần.
+                      </p>
+                      <label className="mt-3 block cursor-pointer rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] bg-slate-50 px-3 py-2 text-sm text-orange-600 hover:bg-slate-100">
+                        <span className="inline-flex items-center gap-2">
+                          <IconUpload className="h-4 w-4" /> Tải video lên
+                        </span>
+                        <input
+                          type="file"
+                          accept="video/*"
+                          onChange={onPickTrailer}
+                          className="hidden"
+                        />
+                      </label>
+                      {trailerUrl && (
+                        <video
+                          src={URL_BASE + trailerUrl}
+                          controls
+                          className="mt-3 h-28 rounded-md"
+                        />
+                      )}
                     </div>
                   </div>
-                </div>
-              </div>
-*/}
-              <div className="mt-8 flex items-center justify-between">
-                <button className="rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">
-                  Hủy bỏ
-                </button>
-                <button
-                  onClick={next}
-                  className="rounded-md bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600"
-                >
-                  Lưu và tiếp tục
-                </button>
-              </div>
-            </div>
-          )}
 
-          {/* ADVANCE */}
-          {tab === 1 && (
-            <div>
-              <h2 className="mb-6 text-xl font-semibold text-slate-900">
-                Thông tin nâng cao
-              </h2>
+                  <div className="mt-6">
+                    <div className="mb-1 text-sm font-medium">
+                      Mô tả khóa học <span className="text-red-600">*</span>
+                    </div>
 
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <div className="rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] p-4">
-                  <div className="mb-2 text-sm font-medium">
-                    Hình thu nhỏ của khóa học
-                  </div>
-                  <p className="text-xs text-slate-500">
-                    Tải hình thu nhỏ của khóa học lên đây.{" "}
-                    <span className="font-medium">Hướng dẫn quan trọng:</span>{" "}
-                    1200×800 pixel hoặc Tỷ lệ 12:8. Định dạng được hỗ trợ:{" "}
-                    <b>jpg, jpeg, or png</b>.
-                  </p>
-                  <label className="mt-3 block cursor-pointer rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] bg-slate-50 px-3 py-2 text-sm text-orange-600 hover:bg-slate-100">
-                    <span className="inline-flex items-center gap-2">
-                      <IconUpload className="h-4 w-4" /> Tải hình ảnh lên
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={onPickThumb}
-                      className="hidden"
-                    />
-                  </label>
-                  {thumbUrl && (
-                    <img
-                      src={URL_BASE + thumbUrl}
-                      className="mt-3 h-28 rounded-md object-cover"
-                    />
-                  )}
-                </div>
-
-                <div className="rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] p-4">
-                  <div className="mb-2 text-sm font-medium">
-                    Đoạn giới thiệu khóa học
-                  </div>
-                  <p className="text-xs text-slate-500">
-                    Những sinh viên xem video quảng cáo được làm tốt có khả năng
-                    đăng ký khóa học của bạn cao hơn 5 lần.
-                  </p>
-                  <label className="mt-3 block cursor-pointer rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] bg-slate-50 px-3 py-2 text-sm text-orange-600 hover:bg-slate-100">
-                    <span className="inline-flex items-center gap-2">
-                      <IconUpload className="h-4 w-4" /> Tải video lên
-                    </span>
-                    <input
-                      type="file"
-                      accept="video/*"
-                      onChange={onPickTrailer}
-                      className="hidden"
-                    />
-                  </label>
-                  {trailerUrl && (
-                    <video
-                      src={URL_BASE + trailerUrl}
-                      controls
-                      className="mt-3 h-28 rounded-md"
-                    />
-                  )}
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <div className="mb-1 text-sm font-medium">Mô tả khóa học</div>
-
-                {/* focus viền mảnh #ff6e54 */}
-                <div
-                  className="rounded-md border border-slate-300 
+                    {/* focus viền mảnh #ff6e54 */}
+                    <div
+                      className="rounded-md border border-slate-300 
                   focus-within:ring-1 focus-within:ring-[#ff6e54] 
                   focus-within:border-[#ff6e54]"
-                >
-                  {/* Thanh toolbar */}
-                  <div className="flex gap-1 border-b border-slate-200 px-2 py-1">
-                    <Btn
-                      onClick={() => editor.chain().focus().toggleBold().run()}
-                      active={editor.isActive("bold")}
                     >
-                      B
-                    </Btn>
-                    <Btn
-                      onClick={() =>
-                        editor.chain().focus().toggleItalic().run()
-                      }
-                      active={editor.isActive("italic")}
-                    >
-                      I
-                    </Btn>
-                    <Btn
-                      onClick={() =>
-                        editor.chain().focus().toggleUnderline().run()
-                      }
-                      active={editor.isActive("underline")}
-                    >
-                      U
-                    </Btn>
-                    <div className="mx-1 h-5 w-px bg-slate-200" />
-                    <Btn
-                      onClick={() =>
-                        editor.chain().focus().toggleBulletList().run()
-                      }
-                      active={editor.isActive("bulletList")}
-                    >
-                      •
-                    </Btn>
-                    <Btn
-                      onClick={() =>
-                        editor.chain().focus().toggleOrderedList().run()
-                      }
-                      active={editor.isActive("orderedList")}
-                    >
-                      1.
-                    </Btn>
-                    <div className="mx-1 h-5 w-px bg-slate-200" />
-                    <Btn
-                      onClick={() =>
-                        editor.chain().focus().toggleBlockquote().run()
-                      }
-                      active={editor.isActive("blockquote")}
-                    >
-                      “ ”
-                    </Btn>
-                  </div>
+                      {/* Thanh toolbar */}
+                      <div className="flex gap-1 border-b border-slate-200 px-2 py-1">
+                        <Btn
+                          onClick={() =>
+                            editor.chain().focus().toggleBold().run()
+                          }
+                          active={editor.isActive("bold")}
+                        >
+                          B
+                        </Btn>
+                        <Btn
+                          onClick={() =>
+                            editor.chain().focus().toggleItalic().run()
+                          }
+                          active={editor.isActive("italic")}
+                        >
+                          I
+                        </Btn>
+                        <Btn
+                          onClick={() =>
+                            editor.chain().focus().toggleUnderline().run()
+                          }
+                          active={editor.isActive("underline")}
+                        >
+                          U
+                        </Btn>
+                        <div className="mx-1 h-5 w-px bg-slate-200" />
+                        <Btn
+                          onClick={() =>
+                            editor.chain().focus().toggleBulletList().run()
+                          }
+                          active={editor.isActive("bulletList")}
+                        >
+                          •
+                        </Btn>
+                        <Btn
+                          onClick={() =>
+                            editor.chain().focus().toggleOrderedList().run()
+                          }
+                          active={editor.isActive("orderedList")}
+                        >
+                          1.
+                        </Btn>
+                        <div className="mx-1 h-5 w-px bg-slate-200" />
+                        <Btn
+                          onClick={() =>
+                            editor.chain().focus().toggleBlockquote().run()
+                          }
+                          active={editor.isActive("blockquote")}
+                        >
+                          “ ”
+                        </Btn>
+                      </div>
 
-                  {/* Khu vực soạn thảo */}
-                  <EditorContent
-                    editor={editor}
-                    className="tiptap px-3 py-2 text-sm min-h-[100px] 
+                      {/* Khu vực soạn thảo */}
+                      <EditorContent
+                        editor={editor}
+                        className="tiptap px-3 py-2 text-sm min-h-[100px] 
                focus:outline-none focus-visible:outline-0 focus:ring-0"
-                  />
-                </div>
-              </div>
-              {/* 
+                      />
+                    </div>
+                  </div>
+                  {/* 
               <div className="mt-8 space-y-8">
                 {[
                   {
@@ -802,12 +736,11 @@ export default function DashboardTeacherNewCourse() {
                 ))}
               </div>
 */}
+                </div>
+              }
               <div className="mt-8 flex items-center justify-between">
-                <button
-                  onClick={prev}
-                  className="rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
-                >
-                  Previous
+                <button className="rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">
+                  Hủy bỏ
                 </button>
                 <button
                   onClick={next}
@@ -819,8 +752,10 @@ export default function DashboardTeacherNewCourse() {
             </div>
           )}
 
+          {/* ADVANCE */}
+
           {/* CURRICULUM */}
-          {tab === 2 && (
+          {tab === 1 && (
             <div>
               <h2 className="mb-6 text-xl font-semibold text-slate-900">
                 Chương trình học
@@ -856,81 +791,187 @@ export default function DashboardTeacherNewCourse() {
                       </div>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       {sec.lectures.map((lec) => (
                         <div
                           key={lec.id}
-                          className="flex items-center gap-3 rounded-md bg-white p-3 ring-1 ring-slate-200"
+                          className="rounded-md bg-white ring-1 ring-slate-200"
                         >
-                          <span className="text-slate-400">≡</span>
-                          <input
-                            value={lec.name}
-                            onChange={(e) =>
-                              renameLecture(sec.id, lec.id, e.target.value)
-                            }
-                            className="flex-1 rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] px-3 py-2 text-sm"
-                          />
-                          <div className="relative flex items-center justify-center gap-4 h-24">
-                            <button
-                              onClick={() => toggleLectureMenu(sec.id, lec.id)}
-                              className="rounded-md bg-white px-3 h-20 text-sm ring-1 ring-slate-200"
-                            >
-                              Contents{" "}
-                              <IconChevronDown className="ml-1 inline h-4 w-4" />
-                            </button>
-                            {/* {lec.menuOpen && (
-                              <div className="absolute right-0 z-10 mt-2 w-44 rounded-md bg-white p-1 shadow-lg ring-1 ring-slate-200">
-                                {[
-                                  "Video",
-                                  "Attach File",
-                                  "Captions",
-                                  "Description",
-                                  "Lecture Notes",
-                                ].map((m) => (
-                                  <button
-                                    key={m}
-                                    className="block w-full rounded px-2 py-1 text-left text-sm hover:bg-slate-50"
-                                  >
-                                    {m}
-                                  </button>
-                                ))}
-                              </div>
-                            )} */}
+                          {/* ---- ROW 1: Header lesson ---- */}
+                          <div className="flex items-center gap-3 p-3">
+                            <span className="text-slate-400">≡</span>
 
-                            {lec.videoUrl ? (
-                              <video
-                                src={URL_BASE + lec.videoUrl}
-                                controls
-                                className=" h-20 rounded-md"
+                            <input
+                              value={lec.name}
+                              onChange={(e) =>
+                                renameLecture(sec.id, lec.id, e.target.value)
+                              }
+                              className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm
+                     focus:outline-none focus:ring-1 focus:ring-orange-500"
+                            />
+
+                            {/* Add video button */}
+                            <label
+                              className="px-3 py-1 text-sm cursor-pointer rounded-md bg-orange-50 
+                          ring-1 ring-orange-200 hover:bg-orange-100"
+                            >
+                              Add video
+                              <input
+                                type="file"
+                                accept="video/*"
+                                className="hidden"
+                                onChange={(e) =>
+                                  handleVideoUpload(
+                                    lec.id,
+                                    e.target.files[0],
+                                    lec.videoUrl
+                                  )
+                                }
                               />
-                            ) : (
-                              <label
-                                className={`rounded-md bg-white h-20 px-3 flex items-center text-sm ring-1 ring-slate-200 cursor-pointer hover:bg-slate-50 ${
-                                  uploading
-                                    ? "opacity-50 pointer-events-none"
-                                    : ""
-                                }`}
-                              >
-                                {uploading ? "Đang tải..." : "Add video"}
-                                <input
-                                  type="file"
-                                  accept="video/*"
-                                  className="hidden"
-                                  onChange={(e) =>
-                                    handleVideoUpload(
-                                      lec.id,
-                                      e.target.files[0],
-                                      lec.videoUrl
-                                    )
-                                  }
-                                />
-                              </label>
-                            )}
+                            </label>
+
+                            {/* Add document button */}
+                            <label
+                              className="px-3 py-1 text-sm cursor-pointer rounded-md bg-blue-50 
+                          ring-1 ring-blue-200 hover:bg-blue-100"
+                            >
+                              Add tài liệu
+                              <input
+                                type="file"
+                                accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.txt"
+                                className="hidden"
+                                onChange={(e) =>
+                                  handleDocumentUpload(
+                                    lec.id,
+                                    e.target.files[0]
+                                  )
+                                }
+                              />
+                            </label>
                           </div>
-                          <IconTrash
-                            onClick={() => removeLecture(sec.id, lec.id)}
-                            className="h-8 w-8 cursor-pointer rounded-md bg-white p-1.5 text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
-                          />
+
+                          {/* ---- ROW 2: Files list ---- */}
+                          <div className="px-4 pb-3 space-y-2">
+                            {/* VIDEO PREVIEW LIST */}
+                            {lec.videoUrl && (
+                              <div className="flex justify-between items-center bg-slate-50 px-3 py-2 rounded-md hover:bg-slate-100">
+                                <div
+                                  className="flex-1 cursor-pointer"
+                                  onClick={() =>
+                                    setPreviewItem({
+                                      type: "video",
+                                      url: URL_BASE + lec.videoUrl,
+                                    })
+                                  }
+                                >
+                                  <span className="text-sm">
+                                    Video đã tải lên
+                                  </span>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setPreviewItem({
+                                        type: "video",
+                                        url: URL_BASE + lec.videoUrl,
+                                      });
+                                    }}
+                                    className="text-xs text-slate-500 hover:text-slate-700 cursor-pointer"
+                                  >
+                                    <Eye className="size-5" />
+                                  </button>
+
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      deleteVideoFromLecture(lec.id);
+                                    }}
+                                    disabled={deletingId === `video-${lec.id}`}
+                                    className={`ml-2 rounded px-2 py-1 cursor-pointer text-xs ${
+                                      deletingId === `video-${lec.id}`
+                                        ? "bg-gray-100 text-slate-400"
+                                        : "bg-red-50 text-red-600 ring-1 ring-red-100 hover:bg-red-100"
+                                    }`}
+                                    title="Xóa video"
+                                  >
+                                    {deletingId === `video-${lec.id}` ? (
+                                      "Đang xóa…"
+                                    ) : (
+                                      <Trash className="size-4" />
+                                    )}
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* DOCUMENT LIST */}
+                            {(lec.documents || []).map((d, idx) => (
+                              <div
+                                key={idx}
+                                className="flex justify-between items-center bg-slate-50 px-3 py-2 rounded-md hover:bg-slate-100"
+                              >
+                                <div
+                                  className="truncate max-w-[70%] text-sm cursor-pointer"
+                                  onClick={() =>
+                                    setPreviewItem({
+                                      type: "doc",
+                                      url: d.url,
+                                      name: d.name,
+                                    })
+                                  }
+                                >
+                                  {d.name}
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setPreviewItem({
+                                        type: "doc",
+                                        url: d.url,
+                                        name: d.name,
+                                      });
+                                    }}
+                                    className="text-xs cursor-pointer text-slate-500 hover:text-slate-700"
+                                  >
+                                    <Eye className="size-5" />
+                                  </button>
+
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      deleteDocumentFromLecture(lec.id, idx);
+                                    }}
+                                    disabled={
+                                      deletingId === `doc-${lec.id}-${idx}`
+                                    }
+                                    className={`ml-2 rounded cursor-pointer px-2 py-1 text-xs ${
+                                      deletingId === `doc-${lec.id}-${idx}`
+                                        ? "bg-gray-100 text-slate-400"
+                                        : "bg-red-50 text-red-600 ring-1 ring-red-100 hover:bg-red-100"
+                                    }`}
+                                    title="Xóa tài liệu"
+                                  >
+                                    {deletingId === `doc-${lec.id}-${idx}` ? (
+                                      "Đang xóa…"
+                                    ) : (
+                                      <Trash className="size-4" />
+                                    )}
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+
+                            {(lec.documents || []).length === 0 &&
+                              !lec.videoUrl && (
+                                <div className="text-xs text-slate-400">
+                                  Chưa có video/tài liệu.
+                                </div>
+                              )}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -962,94 +1003,129 @@ export default function DashboardTeacherNewCourse() {
           )}
 
           {/* PUBLISH */}
-          {tab === 3 && (
-            <div>
-              <h2 className="mb-6 text-xl font-semibold text-slate-900">
-                Publish Course
-              </h2>
-
-              <div className="grid gap-6 md:grid-cols-2">
-                <div>
-                  <div className="mb-1 text-sm font-medium">
-                    Welcome Message
-                  </div>
-                  <textarea
-                    rows={5}
-                    value={welcomeMsg}
-                    onChange={(e) => setWelcomeMsg(e.target.value)}
-                    placeholder="Enter course starting message here..."
-                    className="w-full rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] px-3 py-2 text-sm"
-                  />
-                </div>
-                <div>
-                  <div className="mb-1 text-sm font-medium">
-                    Congratulations Message
-                  </div>
-                  <textarea
-                    rows={5}
-                    value={congratsMsg}
-                    onChange={(e) => setCongratsMsg(e.target.value)}
-                    placeholder="Enter your course completed message here..."
-                    className="w-full rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] px-3 py-2 text-sm"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-8">
-                <div className="mb-1 text-sm font-medium">
-                  Add Instructor (02)
-                </div>
-                <div className="relative mb-4">
-                  <IconSearch className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <input
-                    placeholder="Search by username"
-                    className="w-full rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] pl-8 pr-3 py-2 text-sm"
-                  />
-                </div>
-
-                <div className="flex flex-wrap gap-3">
-                  {instructors.map((ins) => (
-                    <div
-                      key={ins.id}
-                      className="flex items-center gap-3 rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#ff6e54] focus:border-[#ff6e54] px-3 py-2"
-                    >
-                      <img src={ins.avatar} className="h-8 w-8 rounded-full" />
-                      <div>
-                        <div className="text-sm font-medium">{ins.name}</div>
-                        <div className="text-xs text-slate-500">{ins.role}</div>
-                      </div>
-                      <button
-                        onClick={() => removeInstructor(ins.id)}
-                        className="ml-1 text-slate-400 hover:text-slate-600"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-10 flex items-center justify-between">
-                <button
-                  onClick={prev}
-                  className="rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
-                >
-                  Prev Step
-                </button>
-                <button
-                  onClick={() => alert("Submit for review!")}
-                  className="rounded-md bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600"
-                >
-                  Submit For Review
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
+      {previewItem && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="relative bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] p-4">
+            {/* Nút đóng */}
+            <button
+              onClick={() => setPreviewItem(null)}
+              aria-label="Close preview"
+              className="absolute -top-3 -right-3 bg-white shadow-lg rounded-full w-8 h-8
+                   flex items-center justify-center text-slate-600 hover:bg-slate-100 hover:text-black"
+            >
+              ✕
+            </button>
+
+            {/* Header (tên file + download) */}
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div className="truncate font-medium text-sm">
+                {previewItem.name ||
+                  decodeURIComponent(
+                    (previewItem.url || "").split("/").pop() || ""
+                  )}
+              </div>
+              <a
+                href={previewItem.url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs text-slate-500 hover:text-slate-700"
+              >
+                Tải về
+              </a>
+            </div>
+
+            {/* Nội dung preview thông minh */}
+            <div className="overflow-auto">
+              {(() => {
+                const ext = getFileExt(
+                  previewItem.name || previewItem.url || ""
+                );
+                const fullUrl = previewItem.url?.startsWith("http")
+                  ? previewItem.url
+                  : `${URL_BASE}${previewItem.url}`;
+                console.log("fullUrl: ", fullUrl);
+                // VIDEO
+                if (
+                  previewItem.type === "video" ||
+                  ["mp4", "webm", "ogg"].includes(ext)
+                ) {
+                  return (
+                    <video
+                      src={fullUrl}
+                      controls
+                      className="w-full max-h-[80vh] rounded-md bg-black"
+                    />
+                  );
+                }
+
+                // PDF: dùng iframe/object nếu có thể
+                if (isPdf(ext)) {
+                  // iframe sẽ hiển thị nếu server trả inline PDF & cho phép embedding
+                  return (
+                    <iframe
+                      src={fullUrl}
+                      className="w-full h-[80vh] rounded-md border"
+                      title={previewItem.name || "PDF preview"}
+                    />
+                  );
+                }
+
+                // DOC / PPT / XLS: sử dụng Google Docs Viewer
+                if (isDocLike(ext)) {
+                  const gview = `https://docs.google.com/gview?url=${encodeURIComponent(
+                    fullUrl
+                  )}&embedded=true`;
+                  return (
+                    <iframe
+                      src={gview}
+                      className="w-full h-[80vh] rounded-md border"
+                      title={previewItem.name || "Document preview"}
+                    />
+                  );
+                }
+
+                // Nếu không xác định: hiển thị message + link download
+                return (
+                  <div className="w-full h-[40vh] flex flex-col items-center justify-center gap-3 rounded-md border-dashed border-2 border-slate-200 p-6 text-center">
+                    <div className="text-sm font-medium">
+                      Không hỗ trợ hiển thị file này
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      Bạn có thể tải file về để xem bằng ứng dụng tương ứng.
+                    </div>
+                    <a
+                      href={previewItem.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-2 rounded-md px-3 py-1 text-sm bg-orange-50 text-orange-600 ring-1 ring-orange-100"
+                    >
+                      Tải về
+                    </a>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+const getFileExt = (urlOrName = "") => {
+  try {
+    const last = (urlOrName || "").split("?")[0].split("/").pop() || "";
+    const parts = last.split(".");
+    return parts.length > 1 ? parts.pop().toLowerCase() : "";
+  } catch {
+    return "";
+  }
+};
+
+const isPdf = (ext) => ext === "pdf";
+const isDocLike = (ext) =>
+  ["doc", "docx", "ppt", "pptx", "xls", "xlsx"].includes(ext);
 
 /* ------------ Inline SVG Icons (JSX) ------------ */
 function IconLayers({ className = "" }) {
@@ -1102,35 +1178,7 @@ function IconPlaySquare({ className = "" }) {
     </svg>
   );
 }
-function IconRocket({ className = "" }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none">
-      <path
-        d="M14 3c4 1 7 4 7 8 0 4-3 8-7 10-1-3-3-5-6-6 1-4 3-9 6-12Z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-      />
-      <path
-        d="M5 19c1-2 3-3 5-3-1 2-3 3-5 3Z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-      />
-      <circle cx="15" cy="10" r="2" stroke="currentColor" strokeWidth="1.6" />
-    </svg>
-  );
-}
-function IconChevronDown({ className = "" }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none">
-      <path
-        d="M6 9l6 6 6-6"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
+
 function IconUpload({ className = "" }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none">
@@ -1142,19 +1190,6 @@ function IconUpload({ className = "" }) {
       />
       <path
         d="M4 21h16"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-function IconSearch({ className = "" }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none">
-      <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.6" />
-      <path
-        d="M20 20l-3-3"
         stroke="currentColor"
         strokeWidth="1.6"
         strokeLinecap="round"
@@ -1184,16 +1219,5 @@ function IconTrash({ className = "", ...p }) {
         strokeLinecap="round"
       />
     </svg>
-  );
-}
-function ToolbarBtn({ children }) {
-  return (
-    <button
-      type="button"
-      className="rounded-md px-2 py-1 text-xs text-slate-600 hover:bg-slate-50"
-      title="UI only"
-    >
-      {children}
-    </button>
   );
 }

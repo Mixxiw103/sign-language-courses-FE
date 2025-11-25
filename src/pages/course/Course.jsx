@@ -1,5 +1,22 @@
+<<<<<<< HEAD
 import { useState, useEffect } from "react";
 import { BookOpen, PenTool, Monitor, Database, Briefcase, BarChart, Camera, Film } from "lucide-react";
+=======
+import { useState } from "react";
+import { ChevronLeft, ChevronRight, Clock, BookOpen } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import CourseCard from "../../components/CourseCard";
+import Header from "../../components/Header";
+import {
+  PenTool,
+  Monitor,
+  Database,
+  Briefcase,
+  BarChart,
+  Camera,
+  Film,
+} from "lucide-react";
+>>>>>>> da34e787d858c11122626d09f6744c0e07e0ec78
 import { AnimatePresence, motion } from "framer-motion";
 import CourseCard from "../../components/CourseCard";
 import Search from "./Search";

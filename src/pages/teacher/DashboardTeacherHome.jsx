@@ -1,4 +1,3 @@
-
 import {
   ResponsiveContainer,
   LineChart,
@@ -14,30 +13,42 @@ import {
 } from "recharts";
 
 const stats = [
-  { label: "Enrolled Courses", value: "957", icon: () => (
-      <span className="grid h-9 w-9 place-items-center rounded-lg bg-orange-50 text-orange-500 ring-1 ring-orange-100">📚</span>
-    ) },
-  { label: "Active Courses", value: "19", icon: () => (
-      <span className="grid h-9 w-9 place-items-center rounded-lg bg-indigo-50 text-indigo-500 ring-1 ring-indigo-100">🧭</span>
-    ) },
-  { label: "Course Instructors", value: "241", icon: () => (
-      <span className="grid h-9 w-9 place-items-center rounded-lg bg-amber-50 text-amber-500 ring-1 ring-amber-100">👥</span>
-    ) },
-  { label: "Completed Courses", value: "951", icon: () => (
-      <span className="grid h-9 w-9 place-items-center rounded-lg bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100">🏆</span>
-    ) },
-  { label: "Students", value: "1,674,767", icon: () => (
-      <span className="grid h-9 w-9 place-items-center rounded-lg bg-rose-50 text-rose-500 ring-1 ring-rose-100">👨‍🎓</span>
-    ) },
-  { label: "Online Courses", value: "3", icon: () => (
-      <span className="grid h-9 w-9 place-items-center rounded-lg bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100">🗓️</span>
-    ) },
-  { label: "USD Total Earning", value: "$7,461,767", icon: () => (
-      <span className="grid h-9 w-9 place-items-center rounded-lg bg-slate-50 text-slate-700 ring-1 ring-slate-200">💵</span>
-    ) },
-  { label: "Course Sold", value: "56,489", icon: () => (
-      <span className="grid h-9 w-9 place-items-center rounded-lg bg-violet-50 text-violet-600 ring-1 ring-violet-100">📦</span>
-    ) },
+  {
+    label: "Students",
+    value: "1,674,767",
+    icon: () => (
+      <span className="grid h-9 w-9 place-items-center rounded-lg bg-rose-50 text-rose-500 ring-1 ring-rose-100">
+        👨‍🎓
+      </span>
+    ),
+  },
+  {
+    label: "Online Courses",
+    value: "3",
+    icon: () => (
+      <span className="grid h-9 w-9 place-items-center rounded-lg bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100">
+        🗓️
+      </span>
+    ),
+  },
+  {
+    label: "USD Total Earning",
+    value: "$7,461,767",
+    icon: () => (
+      <span className="grid h-9 w-9 place-items-center rounded-lg bg-slate-50 text-slate-700 ring-1 ring-slate-200">
+        💵
+      </span>
+    ),
+  },
+  {
+    label: "Course Sold",
+    value: "56,489",
+    icon: () => (
+      <span className="grid h-9 w-9 place-items-center rounded-lg bg-violet-50 text-violet-600 ring-1 ring-violet-100">
+        📦
+      </span>
+    ),
+  },
 ];
 
 const revenueData = [
@@ -63,13 +74,19 @@ const overviewData = [
   { d: "Sat", a: 120000, b: 520000 },
 ];
 
-const profileBars = [3200, 1200, 2600, 1800, 3400, 900, 3000, 2400, 2200, 1700, 3100, 1500];
+const profileBars = [
+  3200, 1200, 2600, 1800, 3400, 900, 3000, 2400, 2200, 1700, 3100, 1500,
+];
 
 const sparkline = [12, 20, 18, 26, 19, 23, 21, 28, 22, 24, 20, 25];
 
 function Card({ children, className = "" }) {
   return (
-    <div className={`rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-100 ${className}`}>{children}</div>
+    <div
+      className={`rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-100 ${className}`}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -80,7 +97,9 @@ function StatCard({ item }) {
       <div className="flex items-center gap-4">
         <Icon />
         <div>
-          <div className="text-xl font-semibold text-slate-900">{item.value}</div>
+          <div className="text-xl font-semibold text-slate-900">
+            {item.value}
+          </div>
           <div className="text-sm text-slate-500">{item.label}</div>
         </div>
       </div>
@@ -99,35 +118,6 @@ export default function DashboardTeacherHome() {
           ))}
         </div>
 
-        {/* Banner */}
-        <div className="overflow-hidden rounded-xl bg-slate-900 text-white">
-          <div className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
-            <div className="flex items-center gap-4">
-              <img
-                src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&w=200&auto=format&fit=crop"
-                className="h-12 w-12 rounded-full object-cover"
-              />
-              <div>
-                <div className="text-lg font-semibold">Vako Shvili</div>
-                <div className="text-sm text-white/80">vako.shvili@gmail.com</div>
-              </div>
-            </div>
-            <div className="flex-1 md:px-10">
-              <div className="text-xs text-white/80">1/4 Steps</div>
-              <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-white/10">
-                <div className="h-full w-1/4 rounded-full bg-emerald-400" />
-              </div>
-              <div className="mt-1 text-xs">25% Completed</div>
-            </div>
-            <div className="flex items-center gap-3">
-              <button className="rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-900 hover:bg-slate-100">
-                Edit Biography
-              </button>
-              <button className="rounded-md bg-white/10 px-2 py-2 hover:bg-white/20">⬇️</button>
-            </div>
-          </div>
-        </div>
-
         {/* Middle row */}
         <div className="grid gap-4 lg:grid-cols-12">
           {/* Recent Activity */}
@@ -138,15 +128,32 @@ export default function DashboardTeacherHome() {
             </div>
             <ul className="space-y-4">
               {[
-                { who: "Kevin", text: "comments on your lecture \"What is ux\" in \"2021 ui/ux design with figma\"", when: "Just now" },
-                { who: "John", text: "give a 5 star rating on your course \"2021 ui/ux design with figma\"", when: "5 mins ago" },
-                { who: "Sraboni", text: "purchase your course \"2021 ui/ux design with figma\"", when: "6 mins ago" },
-                { who: "Arif", text: "purchase your course \"2021 ui/ux design with figma\"", when: "8 mins ago" },
+                {
+                  who: "Kevin",
+                  text: 'comments on your lecture "What is ux" in "2021 ui/ux design with figma"',
+                  when: "Just now",
+                },
+                {
+                  who: "John",
+                  text: 'give a 5 star rating on your course "2021 ui/ux design with figma"',
+                  when: "5 mins ago",
+                },
+                {
+                  who: "Sraboni",
+                  text: 'purchase your course "2021 ui/ux design with figma"',
+                  when: "6 mins ago",
+                },
+                {
+                  who: "Arif",
+                  text: 'purchase your course "2021 ui/ux design with figma"',
+                  when: "8 mins ago",
+                },
               ].map((a, i) => (
                 <li key={i} className="flex gap-3">
                   <span className="mt-1 h-2.5 w-2.5 flex-none rounded-full bg-orange-500"></span>
                   <div className="text-sm leading-6 text-slate-600">
-                    <span className="font-medium text-slate-800">{a.who}</span> {a.text}
+                    <span className="font-medium text-slate-800">{a.who}</span>{" "}
+                    {a.text}
                     <div className="text-xs text-slate-400">{a.when}</div>
                   </div>
                 </li>
@@ -162,12 +169,34 @@ export default function DashboardTeacherHome() {
             </div>
             <div className="h-56">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={revenueData} margin={{ left: 0, right: 0, top: 10, bottom: 0 }}>
+                <LineChart
+                  data={revenueData}
+                  margin={{ left: 0, right: 0, top: 10, bottom: 0 }}
+                >
                   <CartesianGrid vertical={false} stroke="#eef2ff" />
-                  <XAxis dataKey="d" tickLine={false} axisLine={false} fontSize={12} />
-                  <YAxis tickLine={false} axisLine={false} tickFormatter={(v) => `${Math.round(v / 1000)}k`} fontSize={12} />
-                  <Tooltip formatter={(v) => `$${v.toLocaleString()}`} labelClassName="text-slate-700" />
-                  <Line type="monotone" dataKey="v" stroke="#6366f1" strokeWidth={3} dot={false} />
+                  <XAxis
+                    dataKey="d"
+                    tickLine={false}
+                    axisLine={false}
+                    fontSize={12}
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(v) => `${Math.round(v / 1000)}k`}
+                    fontSize={12}
+                  />
+                  <Tooltip
+                    formatter={(v) => `$${v.toLocaleString()}`}
+                    labelClassName="text-slate-700"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="v"
+                    stroke="#6366f1"
+                    strokeWidth={3}
+                    dot={false}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -181,7 +210,9 @@ export default function DashboardTeacherHome() {
             </div>
             <div className="h-56">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={profileBars.map((v, idx) => ({ name: idx + 1, v }))}>
+                <BarChart
+                  data={profileBars.map((v, idx) => ({ name: idx + 1, v }))}
+                >
                   <XAxis dataKey="name" hide />
                   <YAxis hide />
                   <Bar dataKey="v" radius={[4, 4, 0, 0]} fill="#22c55e" />
@@ -207,14 +238,22 @@ export default function DashboardTeacherHome() {
               <div className="flex flex-col items-center justify-center rounded-lg bg-orange-50 p-6 text-orange-600">
                 <div className="text-4xl font-bold">4.6</div>
                 <div className="mt-1">★★★★★</div>
-                <div className="mt-2 text-xs font-medium text-orange-700">Overall Rating</div>
+                <div className="mt-2 text-xs font-medium text-orange-700">
+                  Overall Rating
+                </div>
               </div>
               <div className="h-24 self-center">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={sparkline.map((v, i) => ({ i, v }))}>
                     <YAxis hide />
                     <XAxis hide />
-                    <Line type="monotone" dataKey="v" stroke="#fb923c" strokeWidth={2} dot={false} />
+                    <Line
+                      type="monotone"
+                      dataKey="v"
+                      stroke="#fb923c"
+                      strokeWidth={2}
+                      dot={false}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -231,7 +270,10 @@ export default function DashboardTeacherHome() {
                 <div key={r.s} className="flex items-center gap-3 text-sm">
                   <span className="w-16">{r.s} Star</span>
                   <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
-                    <div className="h-full bg-orange-400" style={{ width: `${r.p}%` }} />
+                    <div
+                      className="h-full bg-orange-400"
+                      style={{ width: `${r.p}%` }}
+                    />
                   </div>
                   <span className="w-10 text-right text-slate-500">{r.p}%</span>
                 </div>
@@ -247,13 +289,41 @@ export default function DashboardTeacherHome() {
             </div>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={overviewData} margin={{ left: 0, right: 0, top: 10, bottom: 0 }}>
+                <AreaChart
+                  data={overviewData}
+                  margin={{ left: 0, right: 0, top: 10, bottom: 0 }}
+                >
                   <CartesianGrid vertical={false} stroke="#eef2ff" />
-                  <XAxis dataKey="d" tickLine={false} axisLine={false} fontSize={12} />
-                  <YAxis tickLine={false} axisLine={false} tickFormatter={(v) => `${Math.round(v / 1000)}k`} fontSize={12} />
-                  <Tooltip formatter={(v) => `$${v.toLocaleString()}`} labelClassName="text-slate-700" />
-                  <Area type="monotone" dataKey="a" stroke="#f97316" fill="#f97316" fillOpacity={0.1} />
-                  <Area type="monotone" dataKey="b" stroke="#6366f1" fill="#6366f1" fillOpacity={0.1} />
+                  <XAxis
+                    dataKey="d"
+                    tickLine={false}
+                    axisLine={false}
+                    fontSize={12}
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(v) => `${Math.round(v / 1000)}k`}
+                    fontSize={12}
+                  />
+                  <Tooltip
+                    formatter={(v) => `$${v.toLocaleString()}`}
+                    labelClassName="text-slate-700"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="a"
+                    stroke="#f97316"
+                    fill="#f97316"
+                    fillOpacity={0.1}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="b"
+                    stroke="#6366f1"
+                    fill="#6366f1"
+                    fillOpacity={0.1}
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -261,7 +331,8 @@ export default function DashboardTeacherHome() {
         </div>
       </div>
     </div>
-  );}
+  );
+}
 
 // ================== COMPACT ONE-PAGE ==================
 export function CompactAllInOnePage() {
@@ -270,7 +341,10 @@ export function CompactAllInOnePage() {
     if (!query) return coursesSeed;
     const q = query.toLowerCase();
     return coursesSeed.filter(
-      (c) => c.title.toLowerCase().includes(q) || c.category.toLowerCase().includes(q) || c.author.toLowerCase().includes(q)
+      (c) =>
+        c.title.toLowerCase().includes(q) ||
+        c.category.toLowerCase().includes(q) ||
+        c.author.toLowerCase().includes(q)
     );
   }, [query]);
 
@@ -296,11 +370,16 @@ export function CompactAllInOnePage() {
       <div className="mx-auto max-w-7xl px-6 -mt-6">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {stats.slice(0, 4).map((s) => (
-            <div key={s.label} className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
+            <div
+              key={s.label}
+              className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-100"
+            >
               <div className="flex items-center gap-4">
                 <s.icon />
                 <div>
-                  <div className="text-lg font-semibold text-slate-900">{s.value}</div>
+                  <div className="text-lg font-semibold text-slate-900">
+                    {s.value}
+                  </div>
                   <div className="text-sm text-slate-500">{s.label}</div>
                 </div>
               </div>
@@ -320,10 +399,26 @@ export function CompactAllInOnePage() {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={revenueData}>
                 <CartesianGrid vertical={false} stroke="#eef2ff" />
-                <XAxis dataKey="d" tickLine={false} axisLine={false} fontSize={12} />
-                <YAxis tickLine={false} axisLine={false} tickFormatter={(v) => `${Math.round(v / 1000)}k`} fontSize={12} />
+                <XAxis
+                  dataKey="d"
+                  tickLine={false}
+                  axisLine={false}
+                  fontSize={12}
+                />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(v) => `${Math.round(v / 1000)}k`}
+                  fontSize={12}
+                />
                 <Tooltip formatter={(v) => `$${v.toLocaleString()}`} />
-                <Line type="monotone" dataKey="v" stroke="#6366f1" strokeWidth={3} dot={false} />
+                <Line
+                  type="monotone"
+                  dataKey="v"
+                  stroke="#6366f1"
+                  strokeWidth={3}
+                  dot={false}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -335,14 +430,19 @@ export function CompactAllInOnePage() {
           </div>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={profileBars.map((v, idx) => ({ name: idx + 1, v }))}>
+              <BarChart
+                data={profileBars.map((v, idx) => ({ name: idx + 1, v }))}
+              >
                 <XAxis dataKey="name" hide />
                 <YAxis hide />
                 <Bar dataKey="v" radius={[4, 4, 0, 0]} fill="#22c55e" />
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <div className="mt-2 text-sm"><span className="font-semibold text-slate-900">$7,443</span> <span className="text-slate-500">earned.</span></div>
+          <div className="mt-2 text-sm">
+            <span className="font-semibold text-slate-900">$7,443</span>{" "}
+            <span className="text-slate-500">earned.</span>
+          </div>
         </div>
       </div>
 
@@ -359,8 +459,12 @@ export function CompactAllInOnePage() {
       {/* Instructors (row of 3) */}
       <div className="mx-auto max-w-7xl px-6 py-12">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-slate-900">Classes taught by real creators</h2>
-          <button className="text-sm font-medium text-slate-700 hover:text-slate-900">See all</button>
+          <h2 className="text-xl font-semibold text-slate-900">
+            Classes taught by real creators
+          </h2>
+          <button className="text-sm font-medium text-slate-700 hover:text-slate-900">
+            See all
+          </button>
         </div>
         <div className="grid gap-8 md:grid-cols-3">
           {instructors.slice(0, 3).map((i) => (
@@ -371,4 +475,3 @@ export function CompactAllInOnePage() {
     </div>
   );
 }
-
