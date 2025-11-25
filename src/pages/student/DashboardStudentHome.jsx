@@ -1,83 +1,157 @@
 import React from "react";
-import { GraduationCap, FileText, Calendar, BarChart3 } from "lucide-react";
+import {
+  GraduationCap,
+  FileText,
+  MessageCircle,
+  Settings,
+} from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function DashboardStudentHome() {
   return (
     <div className="p-6 bg-slate-50 min-h-screen">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-slate-800">Chào mừng, Học sinh!</h1>
-        <p className="text-sm text-slate-500">Theo dõi tiến độ học tập của bạn tại đây.</p>
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold text-slate-800">
+          Chào mừng đến với khu vực Học viên
+        </h1>
+        <p className="text-sm text-slate-500 mt-1">
+          Chọn một mục bên dưới để bắt đầu học, làm bài tập hoặc trao đổi với giảng viên.
+        </p>
       </div>
 
-      {/* Main Content */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Card 1: Khóa học */}
-        <div className="bg-white p-4 rounded-lg shadow hover:shadow-md transition">
+      {/* Quick Intro Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-800 mb-2">
+            Bảng điều khiển dành cho học viên
+          </h2>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            Đây là nơi bạn quản lý toàn bộ hành trình học tập của mình: xem khóa học đã đăng ký,
+            làm bài tập, xem lịch học và trao đổi với giảng viên hoặc bạn học.
+          </p>
+          <p className="text-sm text-slate-600 mt-2">
+            Hãy bắt đầu bằng cách chọn một chức năng ở bên dưới.
+          </p>
+        </div>
+
+        <div className="bg-blue-50 border border-blue-100 p-5 rounded-xl">
+          <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-2">
+            Gợi ý
+          </p>
+          <p className="text-sm text-blue-900">
+            Nên thường xuyên kiểm tra mục <span className="font-semibold">Bài tập</span> và{" "}
+            <span className="font-semibold">Tin nhắn</span> để không bỏ lỡ deadline
+            hoặc thông báo quan trọng từ giảng viên.
+          </p>
+        </div>
+      </div>
+
+      {/* Main Feature Buttons */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        {/* Khóa học của tôi */}
+        <Link
+          to="my-courses"
+          className="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition flex flex-col gap-3 group border border-slate-100"
+        >
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-full">
+            <div className="p-2.5 bg-blue-100 rounded-full">
               <GraduationCap className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-slate-600">Khóa học</p>
-              <p className="text-lg font-semibold text-slate-800">5 Đang học</p>
+              <p className="text-xs font-medium text-slate-500 uppercase">
+                Khóa học
+              </p>
+              <p className="text-base font-semibold text-slate-800">
+                Khóa học của tôi
+              </p>
             </div>
           </div>
-        </div>
+          <p className="text-sm text-slate-600 mt-1 flex-1">
+            Xem danh sách các khóa học bạn đã đăng ký, tiếp tục học dở và theo dõi tiến độ.
+          </p>
+          <span className="text-sm font-medium text-blue-600 group-hover:underline mt-1">
+            Đi tới &rarr;
+          </span>
+        </Link>
 
-        {/* Card 2: Bài tập */}
-        <div className="bg-white p-4 rounded-lg shadow hover:shadow-md transition">
+        {/* Bài tập */}
+        <Link
+          to="assignments"
+          className="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition flex flex-col gap-3 group border border-slate-100"
+        >
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 rounded-full">
-              <FileText className="h-6 w-6 text-green-600" />
+            <div className="p-2.5 bg-emerald-100 rounded-full">
+              <FileText className="h-6 w-6 text-emerald-600" />
             </div>
             <div>
-              <p className="text-sm text-slate-600">Bài tập</p>
-              <p className="text-lg font-semibold text-slate-800">3 Chưa nộp</p>
+              <p className="text-xs font-medium text-slate-500 uppercase">
+                Bài tập
+              </p>
+              <p className="text-base font-semibold text-slate-800">
+                Bài tập & bài nộp
+              </p>
             </div>
           </div>
-        </div>
+          <p className="text-sm text-slate-600 mt-1 flex-1">
+            Xem danh sách bài tập được giao, deadline và tình trạng nộp bài của bạn.
+          </p>
+          <span className="text-sm font-medium text-emerald-600 group-hover:underline mt-1">
+            Đi tới &rarr;
+          </span>
+        </Link>
 
-        {/* Card 3: Lịch học */}
-        <div className="bg-white p-4 rounded-lg shadow hover:shadow-md transition">
+        {/* Tin nhắn */}
+        <Link
+          to="messages"
+          className="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition flex flex-col gap-3 group border border-slate-100"
+        >
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-100 rounded-full">
-              <Calendar className="h-6 w-6 text-purple-600" />
+            <div className="p-2.5 bg-purple-100 rounded-full">
+              <MessageCircle className="h-6 w-6 text-purple-600" />
             </div>
             <div>
-              <p className="text-sm text-slate-600">Lịch học</p>
-              <p className="text-lg font-semibold text-slate-800">2 Buổi hôm nay</p>
+              <p className="text-xs font-medium text-slate-500 uppercase">
+                Liên lạc
+              </p>
+              <p className="text-base font-semibold text-slate-800">
+                Tin nhắn & thảo luận
+              </p>
             </div>
           </div>
-        </div>
+          <p className="text-sm text-slate-600 mt-1 flex-1">
+            Trao đổi với giảng viên, hỗ trợ viên hoặc bạn học về nội dung khóa học.
+          </p>
+          <span className="text-sm font-medium text-purple-600 group-hover:underline mt-1">
+            Đi tới &rarr;
+          </span>
+        </Link>
 
-        {/* Card 4: Tiến độ */}
-        <div className="bg-white p-4 rounded-lg shadow hover:shadow-md transition">
+        {/* Cài đặt */}
+        <Link
+          to="settings"
+          className="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition flex flex-col gap-3 group border border-slate-100"
+        >
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-orange-100 rounded-full">
-              <BarChart3 className="h-6 w-6 text-orange-600" />
+            <div className="p-2.5 bg-amber-100 rounded-full">
+              <Settings className="h-6 w-6 text-amber-600" />
             </div>
             <div>
-              <p className="text-sm text-slate-600">Tiến độ</p>
-              <p className="text-lg font-semibold text-slate-800">75% Hoàn thành</p>
+              <p className="text-xs font-medium text-slate-500 uppercase">
+                Tài khoản
+              </p>
+              <p className="text-base font-semibold text-slate-800">
+                Cài đặt & thông tin
+              </p>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Additional Section (nếu có trong ảnh) */}
-      <div className="mt-6 bg-white p-6 rounded-lg shadow">
-        <h2 className="text-xl font-semibold text-slate-800 mb-4">Khóa học nổi bật</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-gray-100 p-4 rounded-lg">
-            <h3 className="font-semibold">UX/UI Design</h3>
-            <p className="text-sm text-slate-600">8h 30min - 9 Lessons</p>
-          </div>
-          <div className="bg-gray-100 p-4 rounded-lg">
-            <h3 className="font-semibold">Python Basics</h3>
-            <p className="text-sm text-slate-600">5h 15min - 6 Lessons</p>
-          </div>
-        </div>
+          <p className="text-sm text-slate-600 mt-1 flex-1">
+            Chỉnh sửa hồ sơ cá nhân, đổi mật khẩu và tùy chỉnh trải nghiệm học tập.
+          </p>
+          <span className="text-sm font-medium text-amber-600 group-hover:underline mt-1">
+            Đi tới &rarr;
+          </span>
+        </Link>
       </div>
     </div>
   );
