@@ -22,7 +22,7 @@ export function AuthProvider({ children }) {
   const isRefreshingRef = useRef(false);
   const refreshPromiseRef = useRef(null);
 
-  // ===== Khởi động: đọc từ localStorage
+  //  Khởi động: đọc từ localStorage
   useEffect(() => {
     const saved = loadAuth();
     if (saved?.accessToken && saved?.refreshToken) {
@@ -34,7 +34,7 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
-  // ===== Lưu xuống localStorage mỗi khi token/user đổi
+  //  Lưu xuống localStorage mỗi khi token/user đổi
   useEffect(() => {
     if (accessToken && refreshToken) {
       saveAuth({ accessToken, refreshToken, user });
@@ -43,7 +43,7 @@ export function AuthProvider({ children }) {
     }
   }, [accessToken, refreshToken, user]);
 
-  // ===== Gắn Authorization vào request nếu có accessToken
+  // Gắn Authorization vào request nếu có accessToken
   useEffect(() => {
     const reqId = api.interceptors.request.use((config) => {
       if (accessToken) {
@@ -55,7 +55,7 @@ export function AuthProvider({ children }) {
     return () => api.interceptors.request.eject(reqId);
   }, [accessToken]);
 
-  // ===== Interceptor xử lý 401: thử refresh rồi retry 1 lần
+  //  Interceptor xử lý 401: thử refresh rồi retry 1 lần
   useEffect(() => {
     const resId = api.interceptors.response.use(
       (res) => res,
@@ -101,7 +101,7 @@ export function AuthProvider({ children }) {
     return () => api.interceptors.response.eject(resId);
   }, [refreshToken]);
 
-  // ====== API: login / refresh / logout ======
+  //  API: login / refresh / logout
   async function login({ email, password, captchaToken, access_token, refresh_token }) {
     //  Nếu đã có token (xác minh OTP xong)
     if (access_token && refresh_token) {
