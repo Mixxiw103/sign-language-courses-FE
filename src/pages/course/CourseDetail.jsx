@@ -1,11 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-<<<<<<< HEAD
-import { api } from "../../auth/api";
-import CourseTreeSidebar from "../../components/CourseTreeSidebar"; // 👈 import component mới
-=======
+
 import { api } from "../../utils/api";
->>>>>>> da34e787d858c11122626d09f6744c0e07e0ec78
 
 export default function CourseDetail() {
   const { id } = useParams();
@@ -73,12 +69,18 @@ export default function CourseDetail() {
 
       {/* Nội dung chính */}
       <div className="col-span-18 bg-white shadow-sm p-8">
-        <h1 className="text-2xl font-bold text-slate-900 mb-2 text-left">{course.title}</h1>
+        <h1 className="text-2xl font-bold text-slate-900 mb-2 text-left">
+          {course.title}
+        </h1>
         <p className="text-slate-600 mb-4 text-left">{course.description}</p>
 
         <div className="aspect-video w-full overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-200 to-slate-100 mb-4">
           {course.demo_video_url ? (
-            <video src={course.demo_video_url} controls className="w-full h-full object-cover" />
+            <video
+              src={course.demo_video_url}
+              controls
+              className="w-full h-full object-cover"
+            />
           ) : (
             <div className="flex items-center justify-center h-full text-slate-500">
               Không có video demo
@@ -94,7 +96,9 @@ export default function CourseDetail() {
             className="h-14 w-14 rounded-full object-cover"
           />
           <div>
-            <p className="font-semibold text-slate-900 text-left pb-0.5">Giảng viên</p>
+            <p className="font-semibold text-slate-900 text-left pb-0.5">
+              Giảng viên
+            </p>
             <p className="text-sm text-slate-600">
               ID: {course.lecturer_id || "N/A"}
             </p>
@@ -102,7 +106,9 @@ export default function CourseDetail() {
         </div>
 
         <div className="mt-6 border-t border-slate-200 pt-4">
-          <h2 className="text-lg font-semibold text-slate-900 mb-2 text-left">Mô tả khóa học</h2>
+          <h2 className="text-lg font-semibold text-slate-900 mb-2 text-left">
+            Mô tả khóa học
+          </h2>
           <p className="text-slate-700 text-left">{course.description}</p>
         </div>
       </div>

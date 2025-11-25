@@ -1,12 +1,8 @@
-<<<<<<< HEAD
-import { useState, useEffect } from "react";
-import { BookOpen, PenTool, Monitor, Database, Briefcase, BarChart, Camera, Film } from "lucide-react";
-=======
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, Clock, BookOpen } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import CourseCard from "../../components/CourseCard";
-import Header from "../../components/Header";
+import Header from "../../components/HeaderP";
 import {
   PenTool,
   Monitor,
@@ -16,9 +12,8 @@ import {
   Camera,
   Film,
 } from "lucide-react";
->>>>>>> da34e787d858c11122626d09f6744c0e07e0ec78
 import { AnimatePresence, motion } from "framer-motion";
-import CourseCard from "../../components/CourseCard";
+// import CourseCard from "../../components/CourseCard";
 import Search from "./Search";
 import { courseApi } from "../../utils/apis/courseService"; // ✅ import service
 
@@ -34,11 +29,11 @@ export default function CoursePage() {
     exit: { opacity: 0, y: -6, transition: { duration: 0.2 } },
   };
 
-  // ===== 🧠 GỌI API từ BE thông qua service =====
+  // =====  GỌI API từ BE thông qua service =====
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await courseApi.list({ limit: 8 }); // 👈 bạn có thể truyền thêm params (page, q, sort,...)
+        const res = await courseApi.list({ limit: 8 }); //  bạn có thể truyền thêm params (page, q, sort,...)
         setCourses(res.data.items || []);
       } catch (err) {
         console.error("Lỗi khi tải khóa học:", err);
@@ -52,14 +47,49 @@ export default function CoursePage() {
 
   // ===== Danh mục mẫu =====
   const categories = [
-    { id: 1, name: "Design", icon: PenTool, color: "bg-teal-100 text-teal-600" },
-    { id: 2, name: "Development", icon: Monitor, color: "bg-indigo-100 text-indigo-600" },
-    { id: 3, name: "Technology", icon: Database, color: "bg-blue-100 text-blue-600" },
-    { id: 4, name: "Business", icon: Briefcase, color: "bg-emerald-100 text-emerald-600" },
-    { id: 5, name: "Marketing", icon: BarChart, color: "bg-amber-100 text-amber-600" },
-    { id: 6, name: "Photography", icon: Camera, color: "bg-rose-100 text-rose-600" },
+    {
+      id: 1,
+      name: "Design",
+      icon: PenTool,
+      color: "bg-teal-100 text-teal-600",
+    },
+    {
+      id: 2,
+      name: "Development",
+      icon: Monitor,
+      color: "bg-indigo-100 text-indigo-600",
+    },
+    {
+      id: 3,
+      name: "Technology",
+      icon: Database,
+      color: "bg-blue-100 text-blue-600",
+    },
+    {
+      id: 4,
+      name: "Business",
+      icon: Briefcase,
+      color: "bg-emerald-100 text-emerald-600",
+    },
+    {
+      id: 5,
+      name: "Marketing",
+      icon: BarChart,
+      color: "bg-amber-100 text-amber-600",
+    },
+    {
+      id: 6,
+      name: "Photography",
+      icon: Camera,
+      color: "bg-rose-100 text-rose-600",
+    },
     { id: 7, name: "Acting", icon: Film, color: "bg-gray-100 text-gray-600" },
-    { id: 8, name: "Management", icon: BookOpen, color: "bg-green-100 text-green-600" },
+    {
+      id: 8,
+      name: "Management",
+      icon: BookOpen,
+      color: "bg-green-100 text-green-600",
+    },
   ];
 
   return (
@@ -111,8 +141,12 @@ export default function CoursePage() {
                       <div className={`p-3 rounded-lg ${cat.color} mb-4`}>
                         <cat.icon className="w-6 h-6" />
                       </div>
-                      <h3 className="font-semibold text-gray-700 mb-2">{cat.name}</h3>
-                      <p className="text-sm text-gray-500">Khám phá các khóa học hấp dẫn.</p>
+                      <h3 className="font-semibold text-gray-700 mb-2">
+                        {cat.name}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Khám phá các khóa học hấp dẫn.
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -123,11 +157,15 @@ export default function CoursePage() {
             <section className="bg-blue-50 py-12 px-6">
               <div className="max-w-6xl mx-auto">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-semibold text-gray-800">Khóa học hiện có</h2>
+                  <h2 className="text-xl font-semibold text-gray-800">
+                    Khóa học hiện có
+                  </h2>
                 </div>
 
                 {loading ? (
-                  <p className="text-center text-gray-500 py-10">Đang tải dữ liệu...</p>
+                  <p className="text-center text-gray-500 py-10">
+                    Đang tải dữ liệu...
+                  </p>
                 ) : error ? (
                   <p className="text-center text-red-500 py-10">{error}</p>
                 ) : courses.length === 0 ? (
