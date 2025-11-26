@@ -26,15 +26,31 @@ export default function CourseDetail() {
   const [loading, setLoading] = useState(true);
 
   /* -------------------- LOAD DATA -------------------- */
-  //  Fetch dữ liệu khóa học
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
+
+        // 1) Lấy info khóa học
         const res = await api.get(`/api/courses/${id}/tree`);
         const data = res.data;
 
-        // Map dữ liệu MongoDB → React format
+        let purchased = false;
+
+        // 2) Check đã mua (nếu login)
+        if (user) {
+          try {
+            const check = await api.get(`/api/purchases/check?courseId=${id}`);
+            purchased = check.data.isPurchased;
+          } catch (e) {
+            console.log("Không check purchase được");
+          }
+        }
+
+        setIsPurchased(purchased);
+        setCourse(data);
+
+        // 3) Áp trạng thái bài học dựa vào purchased
         const formattedSections = (data.chapters || []).map((ch) => ({
           id: ch._id,
           title: ch.title,
@@ -42,23 +58,40 @@ export default function CourseDetail() {
             id: l._id,
             title: l.title,
             durationMin: l.duration_min || 10,
-            status: "idle",
+            status: purchased ? "unlocked" : "locked",
             documents: l.documents || [],
           })),
         }));
 
-        setCourse(data);
         setSections(formattedSections);
       } catch (err) {
-        console.error(" Lỗi khi tải khóa học:", err);
-        setError("Không thể tải dữ liệu khóa học.");
+        console.error("Lỗi khi tải khóa học:", err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [id]);
+  }, [id, user]);
+
+  //  Mua khoá học
+  const handleBuy = async () => {
+    if (!user) return alert("Bạn cần đăng nhập!");
+    console.log("Hi");
+    const orderCode = Date.now().toString(); // mã đơn hàng
+    const amount = course.price; // số tiền
+    const ipAddr = "127.0.0.1"; // local
+    const courseId = id;
+
+    const res = await api.post("/api/payments/create-payment", {
+      orderCode,
+      amount,
+      ipAddr,
+      courseId,
+    });
+
+    window.location.href = res.data.paymentUrl;
+  };
 
   if (loading || !course) {
     return (
@@ -99,7 +132,10 @@ export default function CourseDetail() {
 
         {/* BUY BUTTON */}
         {!isPurchased && (
-          <button className="mt-6 w-full bg-gray-800 hover:bg-gray-900 text-white py-3 text-lg rounded-xl font-semibold">
+          <button
+            onClick={handleBuy}
+            className="mt-6 w-full bg-gray-800 hover:bg-gray-900 text-white py-3 text-lg rounded-xl font-semibold cursor-pointer"
+          >
             Mua khóa học — {course.price?.toLocaleString()}₫
           </button>
         )}
