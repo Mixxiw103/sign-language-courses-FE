@@ -10,9 +10,9 @@ function Badge({ children }) {
 
 export default function CourseCard({ c }) {
   return (
-    // ✅ Dùng Link bọc toàn bộ card để điều hướng tới trang chi tiết
+    //  Dùng Link bọc toàn bộ card để điều hướng tới trang chi tiết
     <Link
-      to={`/courses/${c.id || c._id}`} // 👈 id lấy từ props (BE trả _id)
+      to={`/courses/${c.id || c._id}`} //  id lấy từ props (BE trả _id)
       className="block cursor-pointer text-left group rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-100 transition hover:shadow-md"
     >
       <div className="relative overflow-hidden rounded-xl">

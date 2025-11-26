@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import HomeIntroduceImg from "../../assets/Home_introduce.png";
 import CourseCard from "../../components/CourseCard";
@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import Footer from "../../components/Footer";
 import { useAuth } from "../../auth/AuthContext";
+import { api } from "../../utils/api";
 
 const Badge = ({ value = "", title = "" }) => {
   return (
@@ -49,6 +50,27 @@ const BaseBadge = ({ title = "", desc = "", icon }) => {
 export default function Home() {
   const { user } = useAuth();
   console.log("user: ", user);
+  // Thành tựu đạt được
+  const [achievements, setAchievements] = useState(null);
+  // Top khoá học
+  const [topCourses, setTopCourses] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res1 = await api.get("/home/achievements");
+        const res2 = await api.get("/home/top-courses");
+
+        setAchievements(res1.data.data);
+        setTopCourses(res2.data.data);
+      } catch (err) {
+        console.error("API Home error:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const [showVideo, setShowVideo] = useState(false);
   const sampleCourse = {
     image:
@@ -130,13 +152,16 @@ export default function Home() {
           Sau 15 năm hoạt động, chúng tôi đã đạt được nhiều thành tựu đáng quý,
           hãy cùng nhìn lại những con số sau.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 text-center">
-          <Badge value="15k+" title="Học sinh" />
-          <Badge value="75%" title="Khóa học" />
-          <Badge value="35" title="Đã tốt nghiệp" />
-          <Badge value="26" title="Giáo viên" />
-          <Badge value="1" title="Năm hoạt động" />
-        </div>
+
+        {achievements && (
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 text-center">
+            <Badge value={achievements.totalStudents} title="Học sinh" />
+            <Badge value={achievements.totalCourses} title="Khóa học" />
+            <Badge value="35" title="Đã tốt nghiệp" />
+            <Badge value={achievements.totalLecturers} title="Giáo viên" />
+            <Badge value="1" title="Năm hoạt động" />
+          </div>
+        )}
       </section>
 
       {/* Nền tảng học NNKH trực tuyến Section */}
@@ -239,6 +264,29 @@ export default function Home() {
           <h2 className="text-2xl font-bold text-slate-800">
             Khám phá các khoá học của chúng mình
           </h2>
+          <section className="mt-10">
+            <h2 className="text-2xl font-bold text-slate-800 mb-4">
+              Top 3 khóa học
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {topCourses.map((course) => (
+                <CourseCard
+                  key={course._id}
+                  c={{
+                    image: course.thumbnail_url,
+                    category: "Ngôn ngữ ký hiệu",
+                    duration: "",
+                    title: course.title,
+                    description: course.description,
+                    avatar: course.lecturer_id?.avatar_url,
+                    author: course.lecturer_id?.full_name,
+                    price: course.price,
+                  }}
+                />
+              ))}
+            </div>
+          </section>
         </div>
         <div className="flex justify-end mb-6">
           <button className="flex items-center gap-2 px-5 py-2 rounded-full border border-cyan-500 text-cyan-600 font-medium hover:bg-cyan-500 hover:text-white transition">

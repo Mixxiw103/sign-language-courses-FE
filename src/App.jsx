@@ -202,22 +202,22 @@ function AppRoutes() {
 export default function App() {
   return (
     <AuthProvider>
-      <CallProvider>
-        <AppRoutes />
-        {/* ToastContainer đặt ở root để dùng ở mọi nơi */}
-        <ToastContainer
-          position="top-right"
-          autoClose={4000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
-      </CallProvider>
+      {/* <CallProvider> */}
+      <AppRoutes />
+      {/* ToastContainer đặt ở root để dùng ở mọi nơi */}
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+      {/* </CallProvider> */}
     </AuthProvider>
   );
 }
