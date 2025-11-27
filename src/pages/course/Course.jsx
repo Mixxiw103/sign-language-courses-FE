@@ -297,6 +297,32 @@ export default function CoursePage() {
       {/* ===== GỢI Ý CHO BẠN ===== */}
       <section className="py-8 px-6">
         <div className="max-w-6xl mx-auto">
+          {/* ===== Danh mục khóa học ===== */}
+          <section className="py-8 px-6">
+            <div className="max-w-6xl mx-auto">
+              <h2 className="text-xl font-semibold text-gray-800 mb-8">
+                Chọn khóa học yêu thích từ danh mục nổi bật
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {categories.map((cat) => (
+                  <div
+                    key={cat.id}
+                    className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center text-center hover:shadow-lg transition"
+                  >
+                    <div className={`p-3 rounded-lg ${cat.color} mb-4`}>
+                      <cat.icon className="w-6 h-6" />
+                    </div>
+                    <h3 className="font-semibold text-gray-700 mb-2">
+                      {cat.name}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
           <h2 className="text-xl font-semibold text-gray-800 mb-4 text-left">
             Gợi ý cho bạn
           </h2>
@@ -315,30 +341,7 @@ export default function CoursePage() {
           )}
         </div>
       </section>
-      {/* ===== Danh mục khóa học ===== */}
-      <section className="py-8 px-6">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-xl font-semibold text-gray-800 mb-8">
-            Chọn khóa học yêu thích từ danh mục nổi bật
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {categories.map((cat) => (
-              <div
-                key={cat.id}
-                className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center text-center hover:shadow-lg transition"
-              >
-                <div className={`p-3 rounded-lg ${cat.color} mb-4`}>
-                  <cat.icon className="w-6 h-6" />
-                </div>
-                <h3 className="font-semibold text-gray-700 mb-2">{cat.name}</h3>
-                <p className="text-sm text-gray-500">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+
       {/* ===== TẤT CẢ KHOÁ HỌC ===== */}
       <section className="bg-blue-50 py-12 px-6">
         <div className="max-w-6xl mx-auto">

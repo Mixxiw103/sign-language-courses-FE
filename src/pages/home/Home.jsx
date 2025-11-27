@@ -58,8 +58,8 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res1 = await api.get("/home/achievements");
-        const res2 = await api.get("/home/top-courses");
+        const res1 = await api.get("/api/home/achievements");
+        const res2 = await api.get("/api/home/top-courses");
 
         setAchievements(res1.data.data);
         setTopCourses(res2.data.data);
