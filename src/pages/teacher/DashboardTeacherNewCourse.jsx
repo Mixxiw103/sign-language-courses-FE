@@ -4,11 +4,12 @@ import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useAuth } from "../../auth/AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react"; // [MOD] Thêm useEffect
 import { api, URL_BASE } from "../../utils/api";
 import { toast } from "react-toastify";
 import { Eye, Trash } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom"; // [MOD] Thêm useParams
+
 function Btn({ children, onClick, active }) {
   return (
     <button
@@ -21,10 +22,17 @@ function Btn({ children, onClick, active }) {
     </button>
   );
 }
+
 export default function DashboardTeacherNewCourse() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  // [MOD] Lấy ID và xác định chế độ
+  const { id } = useParams();
+  const isEditMode = Boolean(id);
+
   const [previewItem, setPreviewItem] = useState(null);
+  const [loadingData, setLoadingData] = useState(false); // [MOD] State loading khi fetch edit
+
   const TABS = [
     { key: "basic", label: "Thông tin khóa học", icon: IconLayers },
     { key: "curriculum", label: "Chương trình học", icon: IconPlaySquare },
@@ -57,9 +65,9 @@ export default function DashboardTeacherNewCourse() {
 
   // ADVANCE
   const [thumbUrl, setThumbUrl] = useState(null);
-  console.log("thumb", thumbUrl);
+  // console.log("thumb", thumbUrl);
   const [trailerUrl, setTrailerUrl] = useState(null);
-  console.log("trailerUrl", trailerUrl);
+  // console.log("trailerUrl", trailerUrl);
   const [descHtml, setDescHtml] = useState("");
   const [teaches, setTeaches] = useState(["", "", "", ""]);
   const [audience, setAudience] = useState(["", "", "", ""]);
@@ -76,7 +84,77 @@ export default function DashboardTeacherNewCourse() {
       ],
     },
   ]);
-  console.log("sections: ", sections);
+  // console.log("sections: ", sections);
+
+  // Khởi tạo editor
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      Link.configure({ openOnClick: false }),
+      Placeholder.configure({
+        placeholder: "Nhập mô tả khóa học...",
+      }),
+    ],
+    content: "",
+    onUpdate: ({ editor }) => {
+      setDescHtml(editor.getHTML());
+    },
+  });
+
+  // [MOD] --- EFFECT: FETCH DATA KHI EDIT ---
+  useEffect(() => {
+    if (!isEditMode || !id) return;
+
+    const fetchCourseData = async () => {
+      setLoadingData(true);
+      try {
+        const res = await api.get(`/api/courses/${id}`);
+        const data = res.data;
+
+        // 1. Fill thông tin cơ bản
+        setTitle(data.title || "");
+        setPrice(data.price || 0);
+        setThumbUrl(data.thumbnail_url || "");
+        setTrailerUrl(data.demo_video_url || "");
+
+        // Cập nhật các trường khác nếu có (Category, Level...)
+        if (data.category) setCategory(data.category);
+        if (data.level) setLevel(data.level);
+
+        // Cập nhật Editor content (quan trọng vì editor load async)
+        if (editor && data.description) {
+          editor.commands.setContent(data.description);
+          setDescHtml(data.description);
+        }
+
+        // 2. Map Chapters (Backend) -> Sections (Frontend)
+        if (data.chapters && data.chapters.length > 0) {
+          const mappedSections = data.chapters.map((chap) => ({
+            id: chap._id, // Giữ ID thực để update
+            name: chap.title,
+            lectures: (chap.lessons || []).map((les) => ({
+              id: les._id, // Giữ ID thực
+              name: les.title,
+              videoUrl: les.video_url || "",
+              documents: les.documents || [],
+            })),
+          }));
+          setSections(mappedSections);
+        }
+      } catch (err) {
+        console.error("Lỗi lấy thông tin khóa học:", err);
+        toast.error("Không thể tải thông tin khóa học");
+        navigate("/teacher/my-courses");
+      } finally {
+        setLoadingData(false);
+      }
+    };
+
+    fetchCourseData();
+  }, [id, isEditMode, editor]); // thêm editor vào dep để setContent khi editor sẵn sàng
+  // ---------------------------------------------------------
+
   const updateLectureVideoUrl = (lectureId, newUrl) => {
     setSections((prevSections) =>
       prevSections.map((section) => ({
@@ -123,7 +201,7 @@ export default function DashboardTeacherNewCourse() {
       durationUnit,
       thumbUrl,
       trailerUrl,
-      desc,
+      desc: descHtml, // Sửa lại biến desc -> descHtml cho đúng state
       teaches,
       audience,
       requirements,
@@ -151,6 +229,7 @@ export default function DashboardTeacherNewCourse() {
     }
 
     const form = new FormData();
+    // [MOD] Sửa thứ tự: append folder trước file
     form.append("folder", `courses/images/${user.id}`);
     form.append("model", "Course");
     form.append("field", "cover_image_url");
@@ -177,6 +256,7 @@ export default function DashboardTeacherNewCourse() {
     }
 
     const form = new FormData();
+    // [MOD] Sửa thứ tự: append folder trước file
     form.append("folder", `courses/videos/${user.id}`);
     // form.append("model", "Course");
     // form.append("field", "promo_video_url");
@@ -240,21 +320,7 @@ export default function DashboardTeacherNewCourse() {
           : sec
       )
     );
-  // Khởi tạo editor
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Underline,
-      Link.configure({ openOnClick: false }),
-      Placeholder.configure({
-        placeholder: "Nhập mô tả khóa học...",
-      }),
-    ],
-    content: "",
-    onUpdate: ({ editor }) => {
-      setDescHtml(editor.getHTML());
-    },
-  });
+
   const [uploading, setUploading] = useState(false);
   const addDocumentToLecture = (lectureId, doc) => {
     setSections((prev) =>
@@ -292,7 +358,7 @@ export default function DashboardTeacherNewCourse() {
   const handleDocumentUpload = async (lecId, file) => {
     if (!file) return;
     const fd = new FormData();
-    // bạn có thể thêm folder theo user: `courses/docs/${user.id}`
+    // [MOD] Sửa thứ tự: append folder trước file
     fd.append("folder", `courses/documents/${user?.id || ""}`);
     fd.append("file", file);
 
@@ -393,11 +459,8 @@ export default function DashboardTeacherNewCourse() {
     if (!file) return;
 
     const fd = new FormData();
-    fd.append(
-      "folder",
-      // `courses/videos/${user.id ? user.id : "690069af9308110a97d22027"}`
-      `courses/videos/`
-    );
+    // [MOD] Sửa thứ tự: append folder trước file
+    fd.append("folder", `courses/videos/${user.id || "anon"}`);
     fd.append("file", file); // tên "video" trùng với field backend nhận
 
     try {
@@ -420,6 +483,8 @@ export default function DashboardTeacherNewCourse() {
       setUploading(false);
     }
   };
+
+  // [MOD] HÀM SUBMIT SỬA ĐỔI ĐỂ HỖ TRỢ CẢ TẠO VÀ SỬA
   const handleSubmitCreate = async () => {
     try {
       // ======= B1: Chuẩn bị object =======
@@ -430,8 +495,11 @@ export default function DashboardTeacherNewCourse() {
           lecturer_id: user.id,
           price: Number(price),
           status: "published",
+          // [MOD] Thêm các trường còn thiếu
           thumbnail_url: thumbUrl || "",
           demo_video_url: trailerUrl || "",
+          category: category === "Chọn..." ? "" : category,
+          // level: level === "Chọn..." ? "" : level,
         },
         chapters: sections.map((sec, secIdx) => ({
           title: sec.name,
@@ -448,26 +516,50 @@ export default function DashboardTeacherNewCourse() {
       console.log("Payload gửi lên server:", payload);
 
       // ======= B2: Gửi lên server =======
-      const res = await api.post("/api/courses/create-structure", payload);
+      let res;
+      if (isEditMode) {
+        // [MOD] Nếu đang sửa thì gọi PUT update structure
+        res = await api.put(`/api/courses/${id}/structure`, payload);
+        toast.success("Cập nhật khóa học thành công!");
+      } else {
+        // [MOD] Nếu tạo mới thì gọi POST
+        res = await api.post("/api/courses/create-structure", payload);
+        toast.success("Tạo khóa học thành công!");
+      }
 
       if (res.status === 200 || res.status === 201) {
-        toast.success("Tạo khóa học thành công!");
         console.log("Server trả về:", res.data);
+        // [MOD] Redirect về danh sách
+        navigate("/teacher/my-courses");
       }
-      // navigate('/teacher/my-courses');
     } catch (err) {
       console.error("Lỗi gửi khóa học:", err.response?.data || err.message);
-      toast.error("Gửi dữ liệu thất bại!");
+      toast.error(
+        "Gửi dữ liệu thất bại: " + (err.response?.data?.error || err.message)
+      );
     }
   };
 
   if (!editor) return null;
+  // [MOD] Hiển thị loading nếu đang fetch data edit
+  if (loadingData)
+    return (
+      <div className="p-10 text-center text-slate-500">
+        Đang tải dữ liệu khóa học...
+      </div>
+    );
+
   return (
     <div className="min-h-screen bg-slate-50 p-6">
       <div className="mx-auto max-w-6xl">
         {/* Tabs header */}
         <div className="rounded-t-xl bg-white px-4 pt-3 shadow-sm ring-1 ring-slate-100">
           <div className="flex items-center gap-6 overflow-x-auto">
+            {/* [MOD] Thêm tiêu đề trang để biết đang Tạo hay Sửa */}
+            <div className="mr-2 font-bold text-lg text-slate-700 whitespace-nowrap py-2">
+              {isEditMode ? "Sửa khóa học" : "Tạo khóa học"}
+            </div>
+
             {TABS.map((t, i) => (
               <button
                 key={t.key}
@@ -678,12 +770,11 @@ export default function DashboardTeacherNewCourse() {
                       <EditorContent
                         editor={editor}
                         className="tiptap px-3 py-2 text-sm min-h-[100px] 
-               focus:outline-none focus-visible:outline-0 focus:ring-0"
+                focus:outline-none focus-visible:outline-0 focus:ring-0"
                       />
                     </div>
                   </div>
-                  {/* 
-              <div className="mt-8 space-y-8">
+                  {/* <div className="mt-8 space-y-8">
                 {[
                   {
                     title: "Những gì bạn sẽ dạy trong khóa học này (4/8)",
@@ -812,7 +903,7 @@ export default function DashboardTeacherNewCourse() {
                                 renameLecture(sec.id, lec.id, e.target.value)
                               }
                               className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm
-                     focus:outline-none focus:ring-1 focus:ring-orange-500"
+                      focus:outline-none focus:ring-1 focus:ring-orange-500"
                             />
 
                             {/* Add video button */}
@@ -1001,7 +1092,8 @@ export default function DashboardTeacherNewCourse() {
                   onClick={handleSubmitCreate}
                   className="rounded-md bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600"
                 >
-                  Đăng tải
+                  {/* [MOD] Đổi text nút dựa trên chế độ */}
+                  {isEditMode ? "Cập nhật" : "Đăng tải"}
                 </button>
               </div>
             </div>
