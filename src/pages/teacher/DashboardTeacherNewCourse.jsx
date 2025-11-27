@@ -8,6 +8,7 @@ import { useState } from "react";
 import { api, URL_BASE } from "../../utils/api";
 import { toast } from "react-toastify";
 import { Eye, Trash } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 function Btn({ children, onClick, active }) {
   return (
     <button
@@ -22,6 +23,7 @@ function Btn({ children, onClick, active }) {
 }
 export default function DashboardTeacherNewCourse() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [previewItem, setPreviewItem] = useState(null);
   const TABS = [
     { key: "basic", label: "Thông tin khóa học", icon: IconLayers },
@@ -425,9 +427,11 @@ export default function DashboardTeacherNewCourse() {
         course: {
           title: title.trim(),
           description: descHtml,
-          lecturer_id: user.id, // hoặc lấy từ context
+          lecturer_id: user.id,
           price: Number(price),
           status: "published",
+          thumbnail_url: thumbUrl || "",
+          demo_video_url: trailerUrl || "",
         },
         chapters: sections.map((sec, secIdx) => ({
           title: sec.name,
@@ -450,6 +454,7 @@ export default function DashboardTeacherNewCourse() {
         toast.success("Tạo khóa học thành công!");
         console.log("Server trả về:", res.data);
       }
+      // navigate('/teacher/my-courses');
     } catch (err) {
       console.error("Lỗi gửi khóa học:", err.response?.data || err.message);
       toast.error("Gửi dữ liệu thất bại!");

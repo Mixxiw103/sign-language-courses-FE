@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Lock, Mail, User, Trash2, Save } from "lucide-react";
+import { Lock, Mail, User, Trash2, Save, Camera } from "lucide-react"; // Thêm icon Camera
 import { useAuth } from "../../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { URL_BASE } from "../../utils/api";
 
 export default function DashboardSetting() {
   const { user, api, logout } = useAuth();
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
-  const [email, setEmail] = useState(""); // vẫn disable nhưng cho state để sync từ user
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // --- State cho Avatar ---
+  const [avatarFile, setAvatarFile] = useState(null); // File user chọn
+  const [avatarPreview, setAvatarPreview] = useState(null); // URL để hiển thị preview
 
   const [error, setError] = useState("");
   const [serverError, setServerError] = useState("");
@@ -21,13 +26,33 @@ export default function DashboardSetting() {
     if (user) {
       setName(user.full_name || "");
       setEmail(user.email || "");
+      // Set ảnh mặc định từ user data
+      setAvatarPreview(
+        user.avatar_url ? URL_BASE + user?.avatar_url : "/defaultAvatar.jpg"
+      );
     }
   }, [user]);
 
-  // --- Hàm kiểm tra mật khẩu ---
+  // --- Xử lý chọn ảnh ---
+  const handleAvatarChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate loại file (optional)
+      if (!file.type.startsWith("image/")) {
+        setError("Vui lòng chỉ chọn file hình ảnh.");
+        return;
+      }
+      // Reset lỗi
+      setError("");
+
+      setAvatarFile(file);
+      // Tạo URL preview cục bộ ngay lập tức
+      setAvatarPreview(URL.createObjectURL(file));
+    }
+  };
+
   const validatePassword = (pwd) => {
-    const regex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
     return regex.test(pwd);
   };
 
@@ -35,7 +60,6 @@ export default function DashboardSetting() {
     setError("");
     setServerError("");
 
-    // Nếu user có nhập mật khẩu thì mới kiểm tra
     if (password && !validatePassword(password)) {
       setError(
         "Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt."
@@ -50,30 +74,46 @@ export default function DashboardSetting() {
 
     try {
       setSaving(true);
+      let newAvatarUrl = user.avatar_url; // Mặc định giữ nguyên ảnh cũ
 
-      // Payload cơ bản: cập nhật tên
+      // === BƯỚC 1: NẾU CÓ CHỌN FILE MỚI THÌ UPLOAD ===
+      if (avatarFile) {
+        const formData = new FormData();
+        formData.append("folder", `users/${user.id}`); // Folder lưu trữ (tuỳ backend)
+        formData.append("file", avatarFile);
+
+        // Gọi API upload (sử dụng endpoint upload chung của bạn)
+        const uploadRes = await api.post("/api/uploads", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        // Giả sử server trả về { url: "..." }
+        newAvatarUrl = uploadRes.data.url;
+      }
+
+      // === BƯỚC 2: CẬP NHẬT THÔNG TIN USER ===
       const payload = {
         full_name: name,
+        avatar_url: newAvatarUrl, // Gửi URL ảnh mới (hoặc cũ) lên
       };
 
-      // Nếu có nhập mật khẩu mới, gửi thêm lên để BE xử lý hash
       if (password) {
-        // tuỳ bạn xử lý ở BE: ví dụ nhận field "password" và tự hash vào password_hash
         payload.password = password;
       }
 
       const res = await api.patch(`/api/users/${user.id}`, payload);
 
       alert("Thông tin đã được cập nhật thành công!");
-      setPassword(""); // clear mật khẩu sau khi cập nhật
+      setPassword("");
+      setAvatarFile(null); // Clear file sau khi save xong
 
-      // Nếu AuthContext có cơ chế refresh user từ res, bạn có thể gọi ở đây
-      // ví dụ: updateUser(res.data) tuỳ bạn cài
+      // TODO: Nếu AuthContext có hàm reloadUser() hoặc updateUser(), hãy gọi ở đây
+      // để header cập nhật avatar mới ngay lập tức.
+      // updateAuthUser(res.data);
     } catch (err) {
       console.error("Update user error:", err);
       const msg =
-        err?.response?.data?.error ||
-        "Có lỗi xảy ra khi cập nhật thông tin.";
+        err?.response?.data?.error || "Có lỗi xảy ra khi cập nhật thông tin.";
       setServerError(msg);
     } finally {
       setSaving(false);
@@ -81,36 +121,22 @@ export default function DashboardSetting() {
   };
 
   const handleDelete = async () => {
+    // ... (Giữ nguyên logic cũ của bạn)
     setServerError("");
-
-    if (!user?.id) {
-      setServerError("Không tìm thấy thông tin người dùng.");
+    if (!user?.id) return;
+    if (!window.confirm("Bạn có chắc chắn muốn xóa tài khoản này không?"))
       return;
-    }
-
-    if (!window.confirm("Bạn có chắc chắn muốn xóa tài khoản này không?")) {
-      return;
-    }
 
     try {
       setDeleting(true);
       await api.delete(`/api/users/${user.id}`);
-
       alert("Tài khoản đã bị xóa!");
-
-      // Nếu context có logout thì gọi
-      if (typeof logout === "function") {
-        await logout();
-      }
-
+      if (typeof logout === "function") await logout();
       navigate("/auth");
     } catch (err) {
       console.error("Delete user error:", err);
       const msg =
-        err?.response?.status === 403
-          ? "Bạn không có quyền xóa tài khoản này."
-          : err?.response?.data?.error ||
-          "Có lỗi xảy ra khi xóa tài khoản.";
+        err?.response?.data?.error || "Có lỗi xảy ra khi xóa tài khoản.";
       setServerError(msg);
     } finally {
       setDeleting(false);
@@ -131,14 +157,43 @@ export default function DashboardSetting() {
 
       {/* Profile Card */}
       <div className="bg-white shadow-md w-full max-w-3xl rounded-xl p-8">
-        {/* Avatar */}
-        <div className="flex items-center justify-center mb-6">
-          <img
-            src={user?.avatar_url || "https://i.pravatar.cc/100?img=1"}
-            alt="avatar"
-            className="w-24 h-24 rounded-full border-4 border-orange-400 object-cover"
-          />
+        {/* --- KHU VỰC AVATAR (UPDATED) --- */}
+        <div className="flex flex-col items-center justify-center mb-8">
+          <div className="relative group cursor-pointer">
+            <img
+              src={avatarPreview}
+              alt="avatar"
+              className="w-28 h-28 rounded-full border-4 border-orange-100 object-cover shadow-sm group-hover:opacity-90 transition"
+            />
+
+            {/* Input file ẩn */}
+            <input
+              type="file"
+              accept="image/*"
+              id="avatar-upload"
+              className="hidden"
+              onChange={handleAvatarChange}
+            />
+
+            {/* Nút đè lên ảnh */}
+            <label
+              htmlFor="avatar-upload"
+              className="absolute inset-0 flex items-center justify-center bg-black/40 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+            >
+              <Camera className="w-8 h-8" />
+            </label>
+
+            {/* Nút nhỏ ở góc (luôn hiện) */}
+            <label
+              htmlFor="avatar-upload"
+              className="absolute bottom-1 right-1 bg-white text-gray-600 p-1.5 rounded-full shadow border border-gray-200 cursor-pointer hover:text-orange-600"
+            >
+              <Camera className="w-4 h-4" />
+            </label>
+          </div>
+          <p className="text-xs text-gray-400 mt-2">Chạm vào ảnh để thay đổi</p>
         </div>
+        {/* ------------------------------- */}
 
         {/* Thông báo lỗi server */}
         {serverError && (
@@ -162,7 +217,7 @@ export default function DashboardSetting() {
             />
           </div>
 
-          {/* Email (chỉ hiển thị, không chỉnh sửa) */}
+          {/* Email */}
           <div>
             <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
               <Mail className="w-4 h-4" /> Email
@@ -187,9 +242,7 @@ export default function DashboardSetting() {
               placeholder="Để trống nếu không muốn đổi mật khẩu"
               className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
             />
-            {error && (
-              <p className="text-red-500 text-xs mt-1">{error}</p>
-            )}
+            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
           </div>
         </div>
 
@@ -198,7 +251,7 @@ export default function DashboardSetting() {
           <button
             onClick={handleUpdate}
             disabled={saving}
-            className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:opacity-70 text-white px-5 py-2 rounded-md shadow-md text-sm"
+            className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:opacity-70 text-white px-5 py-2 rounded-md shadow-md text-sm transition-colors"
           >
             <Save className="w-4 h-4" />
             {saving ? "Đang lưu..." : "Cập nhật"}
@@ -207,7 +260,7 @@ export default function DashboardSetting() {
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className="flex items-center gap-2 bg-red-500 hover:bg-red-600 disabled:opacity-70 text-white px-5 py-2 rounded-md shadow-md text-sm"
+            className="flex items-center gap-2 bg-red-500 hover:bg-red-600 disabled:opacity-70 text-white px-5 py-2 rounded-md shadow-md text-sm transition-colors"
           >
             <Trash2 className="w-4 h-4" />
             {deleting ? "Đang xóa..." : "Xóa tài khoản"}

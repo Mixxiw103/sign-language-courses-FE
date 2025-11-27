@@ -7,7 +7,7 @@ export function parseJwt(token) {
     const jsonPayload = decodeURIComponent(
       atob(base64)
         .split("")
-        .map(c => `%${("00" + c.charCodeAt(0).toString(16)).slice(-2)}`)
+        .map((c) => `%${("00" + c.charCodeAt(0).toString(16)).slice(-2)}`)
         .join("")
     );
     return JSON.parse(jsonPayload);
@@ -27,5 +27,8 @@ export function getUserFromAccessToken(accessToken) {
     email: payload.email,
     role: payload.role,
     exp: payload.exp,
+    avatar_url: payload.avatar_url,
+    phone_number: payload.phone_number,
+    status: payload.status,
   };
 }

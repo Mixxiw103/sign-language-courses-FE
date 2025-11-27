@@ -4,6 +4,7 @@ import { useClickOutsideDebounce } from "../hooks/useClickOutsideDebounce";
 import { useAuth } from "../auth/AuthContext";
 import { ChevronDown } from "lucide-react";
 import logo from "@/assets/logo.png";
+import { URL_BASE } from "../utils/api";
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -76,7 +77,11 @@ export default function Header() {
           {user ? (
             <>
               <img
-                src="https://i.pravatar.cc/40?img=1"
+                src={
+                  user?.avatar_url
+                    ? URL_BASE + user?.avatar_url
+                    : "/defaultAvatar.jpg"
+                }
                 alt="user"
                 className="w-8 h-8 rounded-full"
                 draggable={false}

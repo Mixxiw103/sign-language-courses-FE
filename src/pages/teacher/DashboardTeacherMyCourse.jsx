@@ -35,6 +35,7 @@ export default function DashboardTeacherMyCourse() {
     fetchCourses();
   }, [authLoading, isAuthenticated, user, api]);
 
+  console.log(courses);
   //  Loading UI
   if (loading) {
     return (
@@ -59,9 +60,9 @@ export default function DashboardTeacherMyCourse() {
     <div className="p-6">
       <h2 className="text-2xl font-semibold mb-6">Khoá học của tôi</h2>
 
-      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {courses.map((c) => (
-          <CourseCard key={c.id} c={c} />
+      <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
+        {courses.map((c, i) => (
+          <CourseCard key={i} c={c} />
         ))}
       </div>
     </div>
