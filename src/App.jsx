@@ -173,6 +173,10 @@ function AppRoutes() {
         >
           <Route index element={<DashboardTeacherHome />} />
           <Route path="new-course" element={<DashboardTeacherNewCourse />} />
+          <Route
+            path="courses/edit/:id"
+            element={<DashboardTeacherNewCourse />}
+          />
           <Route path="my-courses" element={<DashboardTeacherMyCourse />} />
           <Route path="earning" element={<DashboardTeacherEarning />} />
           <Route path="messages" element={<DashboardMessage />} />
