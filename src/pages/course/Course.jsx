@@ -50,6 +50,8 @@ export default function CoursePage() {
       // --- TEXT FIELD FALLBACK ---
       title: course.title || "Khoá học chưa có tiêu đề",
       description: course.description || "Khoá học này chưa có mô tả.",
+      thumbnail_url: course.thumbnail_url,
+      lecturer_id: course.lecturer_id,
       category: course.category || course.status || "Chưa phân loại",
       duration: course.duration || "3 tháng",
 
@@ -60,7 +62,7 @@ export default function CoursePage() {
 
       // --- LECTURER INFO ---
       author:
-        course.lecturer_id?.full_name || course.lecturer_name || "Giảng viên",
+        course.lecturer_id?.full_name || course.lecturer_name || "Giảng viên ",
 
       avatar:
         course.lecturer_id?.avatar_url ||
@@ -178,17 +180,95 @@ export default function CoursePage() {
     setSearchValue(e.target.value);
     setPage(1);
   }
+  // ===== DANH MỤC NỔI BẬT =====
+  const categories = [
+    {
+      id: 1,
+      name: "Phát triển Web",
+      icon: Monitor,
+      color: "bg-blue-100 text-blue-600",
+    },
+    {
+      id: 2,
+      name: "Khoa học dữ liệu",
+      icon: BarChart,
+      color: "bg-green-100 text-green-600",
+    },
+    {
+      id: 3,
+      name: "Lập trình Backend",
+      icon: Database,
+      color: "bg-purple-100 text-purple-600",
+    },
+    {
+      id: 4,
+      name: "Thiết kế UI/UX",
+      icon: PenTool,
+      color: "bg-pink-100 text-pink-600",
+    },
+    {
+      id: 5,
+      name: "Marketing",
+      icon: Briefcase,
+      color: "bg-orange-100 text-orange-600",
+    },
+    {
+      id: 6,
+      name: "Dựng phim - Video",
+      icon: Film,
+      color: "bg-yellow-100 text-yellow-600",
+    },
+    {
+      id: 7,
+      name: "Thiết kế đồ hoạ",
+      icon: Camera,
+      color: "bg-red-100 text-red-600",
+    },
+    {
+      id: 8,
+      name: "Kỹ năng mềm",
+      icon: BookOpen,
+      color: "bg-teal-100 text-teal-600",
+    },
+  ];
 
   return (
     <div className="pb-16">
       {/* ===== SEARCH BOX ===== */}
-      {/* ... giữ nguyên ... */}
+      <div className="my-10 relative mx-auto flex w-full max-w-3xl items-center rounded-full bg-white p-1 pl-4 shadow-xl ring-1 ring-slate-100">
+        <input
+          type="text"
+          placeholder="Tìm kiếm khoá học yêu thích"
+          className="h-12 flex-1 rounded-full bg-transparent pl-2 pr-10 text-base text-slate-700 placeholder:text-slate-400 focus:outline-none"
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+        />
 
+        {/* Dấu X clear input */}
+        {searchValue && (
+          <button
+            type="button"
+            onClick={() => setSearchValue("")}
+            className="absolute right-30 p-2 text-slate-300 cursor-pointer text-sm hover:text-slate-600"
+          >
+            <i className="fas fa-times"></i> {/* hoặc dùng icon lib khác */}
+          </button>
+        )}
+
+        <button
+          className="cursor-pointer mr-1 rounded-full bg-slate-900 px-8 py-3 text-sm font-semibold text-white hover:bg-slate-800"
+          type="submit"
+        >
+          Search
+        </button>
+      </div>
       {/* ===== KHOÁ HỌC CỦA BẠN ===== */}
       {isAuthenticated && (
         <section className="py-8 px-6 bg-slate-50">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-xl font-semibold mb-4">Khoá học của bạn</h2>
+            <h2 className="text-xl font-semibold mb-4 text-left">
+              Khoá học của bạn
+            </h2>
 
             {myCourses.length === 0 ? (
               <p className="text-gray-500">Bạn chưa mua khoá học nào.</p>
@@ -217,7 +297,7 @@ export default function CoursePage() {
       {/* ===== GỢI Ý CHO BẠN ===== */}
       <section className="py-8 px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 text-left">
             Gợi ý cho bạn
           </h2>
 
@@ -235,14 +315,37 @@ export default function CoursePage() {
           )}
         </div>
       </section>
-
+      {/* ===== Danh mục khóa học ===== */}
+      <section className="py-8 px-6">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-xl font-semibold text-gray-800 mb-8">
+            Chọn khóa học yêu thích từ danh mục nổi bật
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {categories.map((cat) => (
+              <div
+                key={cat.id}
+                className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center text-center hover:shadow-lg transition"
+              >
+                <div className={`p-3 rounded-lg ${cat.color} mb-4`}>
+                  <cat.icon className="w-6 h-6" />
+                </div>
+                <h3 className="font-semibold text-gray-700 mb-2">{cat.name}</h3>
+                <p className="text-sm text-gray-500">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
       {/* ===== TẤT CẢ KHOÁ HỌC ===== */}
       <section className="bg-blue-50 py-12 px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-xl font-semibold text-gray-800">
+          <h2 className="text-xl font-semibold text-gray-800 text-left">
             Tất cả khoá học
           </h2>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 text-left">
             Tìm thấy {filteredAllCourses.length} khoá học phù hợp.
           </p>
 

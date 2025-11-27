@@ -26,6 +26,11 @@ export default function CourseCard({ c }) {
     // Điều hướng sang trang sửa (bạn sửa đường dẫn này theo router của bạn)
     navigate(`/teacher/courses/edit/${c._id || c.id}`);
   };
+  //  Chuyển html
+  function stripHtml(html) {
+    if (!html) return "";
+    return html.replace(/<[^>]+>/g, "");
+  }
 
   return (
     <Link
@@ -106,11 +111,11 @@ export default function CourseCard({ c }) {
           </Badge>
         </div>
 
-        <h3 className="line-clamp-2 text-base font-semibold text-slate-800 group-hover:text-indigo-600 transition">
+        <h3 className="line-clamp-2 text-base font-semibold text-slate-600 group-hover:text-slate-950 transition">
           {c.title}
         </h3>
         <p className="line-clamp-2 text-sm leading-6 text-slate-500">
-          {c.description}
+          {stripHtml(c.description)}
         </p>
 
         <div className="flex items-center justify-between pt-1">

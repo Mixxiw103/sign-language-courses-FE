@@ -64,7 +64,11 @@ export function AuthProvider({ children }) {
         const status = error?.response?.status;
 
         // Nếu 401 và chưa retry -> refresh
-        if (status === 401 && !original._retry && refreshToken) {
+        if (
+          (status === 401 || status === 403) &&
+          !original._retry &&
+          refreshToken
+        ) {
           original._retry = true;
 
           try {
@@ -102,7 +106,13 @@ export function AuthProvider({ children }) {
   }, [refreshToken]);
 
   //  API: login / refresh / logout
-  async function login({ email, password, captchaToken, access_token, refresh_token }) {
+  async function login({
+    email,
+    password,
+    captchaToken,
+    access_token,
+    refresh_token,
+  }) {
     //  Nếu đã có token (xác minh OTP xong)
     if (access_token && refresh_token) {
       setAccessToken(access_token);
@@ -112,7 +122,11 @@ export function AuthProvider({ children }) {
     }
 
     //  Nếu chưa có token (đăng nhập thường)
-    const res = await api.post("/api/auth/login", { email, password, captchaToken });
+    const res = await api.post("/api/auth/login", {
+      email,
+      password,
+      captchaToken,
+    });
 
     if (res.data?.step === "VERIFY_OTP") {
       return res.data;
@@ -127,8 +141,6 @@ export function AuthProvider({ children }) {
 
     return res.data;
   }
-
-
 
   // Hàm gọi thẳng refresh endpoint (tách riêng để interceptor xài)
   async function doRefreshToken(refresh_token_param) {
@@ -154,7 +166,7 @@ export function AuthProvider({ children }) {
     try {
       // Nếu có endpoint logout server (revoke refresh token), gọi vào đây
       // await api.post('/auth/logout', { refresh_token: refreshToken });
-    } catch { }
+    } catch {}
     setAccessToken(null);
     setRefreshToken(null);
     setUser(null);
