@@ -12,7 +12,6 @@ export default function Header() {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  // ⚠️ Gắn ref cho WRAPPER bao nút + menu, không gắn vào menu riêng lẻ
   const wrapperRef = useClickOutsideDebounce(() => setIsOpen(false), 200);
 
   const linkBase = "transition-colors px-0 py-2";
@@ -20,7 +19,13 @@ export default function Header() {
   const linkInactive = "text-gray-600 hover:text-cyan-500";
 
   return (
-    <header className="w-full bg-white shadow-sm">
+    // 🔥 Header fixed CHUẨN
+    <header
+      className="
+        fixed top-0 left-0 right-0 z-[9999]
+        bg-white/95 backdrop-blur-sm shadow-sm
+      "
+    >
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
         {/* Logo */}
         <div className="flex items-center space-x-2">
@@ -38,6 +43,7 @@ export default function Header() {
           >
             Trang chủ
           </NavLink>
+
           <NavLink
             to="/courses"
             className={({ isActive }) =>
@@ -46,6 +52,7 @@ export default function Header() {
           >
             Khóa học
           </NavLink>
+
           <NavLink
             to="/careers"
             className={({ isActive }) =>
@@ -54,6 +61,7 @@ export default function Header() {
           >
             Nghề nghiệp
           </NavLink>
+
           <NavLink
             to="/blog"
             className={({ isActive }) =>
@@ -62,6 +70,7 @@ export default function Header() {
           >
             Blog
           </NavLink>
+
           <NavLink
             to="/about"
             className={({ isActive }) =>
@@ -87,7 +96,6 @@ export default function Header() {
                 draggable={false}
               />
 
-              {/* Dùng onMouseDown để tránh race với listener ngoài */}
               <button
                 onMouseDown={(e) => {
                   e.stopPropagation();
@@ -107,18 +115,19 @@ export default function Header() {
 
               {/* Dropdown */}
               <div
-                className={`absolute right-0 top-10 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10 origin-top-right
-                  transition transform duration-150
+                className={`
+                  absolute right-0 top-10 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10
+                  transition duration-150 origin-top-right
                   ${
                     isOpen
                       ? "opacity-100 scale-100"
-                      : "pointer-events-none opacity-0 scale-95"
-                  }`}
+                      : "opacity-0 scale-95 pointer-events-none"
+                  }
+                `}
                 role="menu"
               >
                 <button
                   onClick={() => {
-                    if (!user) return navigate("/auth");
                     if (user.role === "lecturer") navigate("/teacher");
                     else if (user.role === "student") navigate("/student");
                     else navigate("/");
@@ -129,6 +138,7 @@ export default function Header() {
                 >
                   Trang cá nhân
                 </button>
+
                 <Link
                   to="/settings"
                   onClick={() => setIsOpen(false)}
@@ -137,13 +147,13 @@ export default function Header() {
                 >
                   Cài đặt
                 </Link>
+
                 <button
                   onClick={() => {
                     logout();
                     setIsOpen(false);
                   }}
-                  className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
-                  role="menuitem"
+                  className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
                 >
                   Đăng xuất
                 </button>
@@ -155,13 +165,13 @@ export default function Header() {
                 to="/auth"
                 className="px-1 py-1.5 min-w-[115px] text-base rounded-3xl border border-cyan-500 text-cyan-500 hover:bg-cyan-50"
               >
-                <span className="text-md">Đăng nhập</span>
+                Đăng nhập
               </Link>
               <Link
                 to="/auth"
-                className="px-1 py-1.5 min-w-[115px] text-base rounded-3xl border border-transparent bg-cyan-500 text-white hover:bg-cyan-600"
+                className="px-1 py-1.5 min-w-[115px] text-base rounded-3xl bg-cyan-500 text-white rounded-3xl hover:bg-cyan-600"
               >
-                <span className="text-md">Đăng ký</span>
+                Đăng ký
               </Link>
             </>
           )}

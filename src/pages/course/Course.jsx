@@ -9,173 +9,113 @@ import {
   Film,
   BookOpen,
 } from "lucide-react";
+
 import CourseCard from "../../components/CourseCard";
-import { courseApi } from "../../utils/apis/courseService";
-import { useAuth } from "../../auth/AuthContext";
-import { api } from "../../utils/api";
 import CourseProgressCard from "../../components/CourseProgressCard";
+
+import { courseApi } from "../../utils/apis/courseService";
+import { api } from "../../utils/api";
+import { useAuth } from "../../auth/AuthContext";
 
 export default function CoursePage() {
   const { user, isAuthenticated } = useAuth();
 
-  // Search + phân trang
   const [searchValue, setSearchValue] = useState("");
   const [page, setPage] = useState(1);
-  const [limit] = useState(8);
+  // Set giới hạn
+  const [limit] = useState(6);
 
-  // Data
+  const [allCourses, setAllCourses] = useState([]);
   const [myCourses, setMyCourses] = useState([]);
   const [recommendCourses, setRecommendCourses] = useState([]);
-  const [allCourses, setAllCourses] = useState([]);
-  const purchasedIds = new Set(myCourses.map((c) => c._id));
-  const filteredAllCourses = allCourses.filter((c) => !purchasedIds.has(c._id));
-  const filteredRecommend = recommendCourses.filter(
-    (c) => !purchasedIds.has(c._id)
-  );
 
-  // Pagination meta
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
-
-  // UI state
   const [loading, setLoading] = useState(true);
   const [loadingMine, setLoadingMine] = useState(false);
   const [loadingRecommend, setLoadingRecommend] = useState(false);
+
+  // Phân trang
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
   const [error, setError] = useState(null);
 
-  //  Hiển thị tiến trình khoá học
-  async function getCourseProgress(courseId) {
-    const res = await api.get(
-      `/api/progress/${user._id}/course/${courseId}/summary`
-    );
-    return res.data;
-  }
-
-  // ===== Helper chuẩn hoá khoá học để đẩy vào CourseCard =====
-  function transformCourse(course) {
-    return {
-      id: course._id,
-
-      // --- TEXT FIELD FALLBACK ---
-      title: course.title || "Khoá học chưa có tiêu đề",
-      description: course.description || "Khoá học này chưa có mô tả.",
-      thumbnail_url: course.thumbnail_url,
-      lecturer_id: course.lecturer_id,
-      category: course.category || course.status || "Chưa phân loại",
-      duration: course.duration || "3 tháng",
-
-      // --- IMAGE FALLBACK ---
-      image:
-        course.thumbnail_url ||
-        "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200",
-
-      // --- LECTURER INFO ---
-      author:
-        course.lecturer_id?.full_name || course.lecturer_name || "Giảng viên ",
-
-      avatar:
-        course.lecturer_id?.avatar_url ||
-        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400",
-
-      // --- PRICE FIELD ---
-      price: course.price || 0,
-      oldPrice:
-        course.old_price || (course.price ? course.price + 20000 : 50000),
-    };
-  }
-
-  // ===== Gọi API: tất cả khoá học + search + phân trang =====
+  // ======================
+  // 1) Lấy TẤT CẢ khóa học
+  // ======================
   useEffect(() => {
-    const fetchAll = async () => {
+    const fetchCourses = async () => {
       try {
         setLoading(true);
-        setError(null);
 
         const res = await courseApi.list({
           page,
           limit,
           q: searchValue || undefined,
         });
-
-        const data = res.data || {};
+        const data = res.data;
+        setAllCourses(res.data.items || []);
         setAllCourses(data.items || []);
         setTotalPages(data.pages || 1);
         setTotalItems(data.total || 0);
-      } catch (err) {
-        console.error("Lỗi khi tải tất cả khóa học:", err);
+      } catch (e) {
+        console.error(e);
         setError("Không thể tải danh sách khóa học");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAll();
-  }, [page, limit, searchValue]);
+    fetchCourses();
+  }, [page, searchValue]);
 
-  // ===== Gọi API: khoá học đã mua của user =====
-  // ====== Lấy tất cả khoá học + phân loại theo purchased ======
+  // ======================
+  // 2) Lấy danh sách khóa đã mua
+  // ======================
   useEffect(() => {
-    const loadCourses = async () => {
+    if (!isAuthenticated || allCourses.length === 0) {
+      setMyCourses([]);
+      return;
+    }
+
+    const fetchMyCourses = async () => {
       try {
-        setLoading(true);
+        setLoadingMine(true);
 
-        // 1) Lấy tất cả khóa học
-        const res = await courseApi.list({
-          page,
-          limit,
-          q: searchValue || undefined,
-        });
+        const purchased = [];
 
-        const list = res.data.items || [];
-
-        // 2) Nếu chưa đăng nhập → không có khoá học của bạn
-        if (!isAuthenticated) {
-          setAllCourses(list);
-          setMyCourses([]);
-          setRecommendCourses(list.slice(0, 4));
-          return;
-        }
-
-        // 3) Nếu có login → check purchased từng khoá
-        const my = [];
-        const notPurchased = [];
-
-        for (const course of list) {
-          const check = await api.get(
-            `/api/purchases/check?courseId=${course._id}`
-          );
+        for (const c of allCourses) {
+          const check = await api.get(`/api/purchases/check?courseId=${c._id}`);
 
           if (check.data.isPurchased) {
-            my.push(course);
-          } else {
-            notPurchased.push(course);
+            purchased.push(c);
           }
         }
 
-        setMyCourses(my);
-        setAllCourses(notPurchased);
-        setRecommendCourses(notPurchased.slice(0, 4)); // lấy 4 khóa gợi ý
-      } catch (err) {
-        console.error("Lỗi tải courses:", err);
+        setMyCourses(purchased);
+      } catch (e) {
+        console.error(e);
       } finally {
-        setLoading(false);
+        setLoadingMine(false);
       }
     };
 
-    loadCourses();
-  }, [page, searchValue, isAuthenticated]);
+    fetchMyCourses();
+  }, [isAuthenticated, allCourses]);
 
-  // ===== Gọi API: gợi ý cho bạn =====
+  // ======================
+  // 3) Gợi ý khóa học
+  // ======================
   useEffect(() => {
     const fetchRecommend = async () => {
       try {
         setLoadingRecommend(true);
-        const res = await courseApi.recommend({ limit: 4 });
-        const data = res.data;
-        const items = data.data || data.items || [];
+
+        const res = await courseApi.list({ limit: 4 });
+        const items = res.data.data || res.data.items || [];
+
         setRecommendCourses(items);
-      } catch (err) {
-        console.error("Lỗi khi tải khóa học gợi ý:", err);
+      } catch (e) {
+        console.error(e);
       } finally {
         setLoadingRecommend(false);
       }
@@ -183,12 +123,6 @@ export default function CoursePage() {
 
     fetchRecommend();
   }, []);
-
-  // ===== Handler: khi search thì reset về trang 1 =====
-  function handleSearchChange(e) {
-    setSearchValue(e.target.value);
-    setPage(1);
-  }
   // ===== DANH MỤC NỔI BẬT =====
   const categories = [
     {
@@ -242,186 +176,141 @@ export default function CoursePage() {
   ];
 
   return (
-    <div className="pb-16">
-      {/* ===== SEARCH BOX ===== */}
-      <div className="my-10 relative mx-auto flex w-full max-w-3xl items-center rounded-full bg-white p-1 pl-4 shadow-xl ring-1 ring-slate-100">
+    <div className="pb-20">
+      {/* SEARCH */}
+      <div className="my-10 mx-auto max-w-3xl flex items-center p-2 bg-white rounded-full shadow">
         <input
-          type="text"
-          placeholder="Tìm kiếm khoá học yêu thích"
-          className="h-12 flex-1 rounded-full bg-transparent pl-2 pr-10 text-base text-slate-700 placeholder:text-slate-400 focus:outline-none"
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
+          placeholder="Tìm kiếm khoá học yêu thích"
+          className="flex-1 px-3 outline-none"
         />
-
-        {/* Dấu X clear input */}
-        {searchValue && (
-          <button
-            type="button"
-            onClick={() => setSearchValue("")}
-            className="absolute right-30 p-2 text-slate-300 cursor-pointer text-sm hover:text-slate-600"
-          >
-            <i className="fas fa-times"></i> {/* hoặc dùng icon lib khác */}
-          </button>
-        )}
-
-        <button
-          className="cursor-pointer mr-1 rounded-full bg-slate-900 px-8 py-3 text-sm font-semibold text-white hover:bg-slate-800"
-          type="submit"
-        >
+        <button className="px-6 py-2 bg-slate-900 text-white rounded-full">
           Search
         </button>
       </div>
-      {/* ===== BÀI HỌC TIẾP THEO (TIẾN TRÌNH KHOÁ HỌC) ===== */}
+      {/* TIẾN TRÌNH KHÓA HỌC */}
       {isAuthenticated && myCourses.length > 0 && (
         <section className="bg-blue-50 py-10 px-6">
           <div className="max-w-6xl mx-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-800">
-                Chào mừng trở lại, sẵn sàng cho bài học tiếp theo?
-              </h2>
-              <button className="text-sm text-black hover:underline">
-                Xem tất cả
-              </button>
-            </div>
-
-            <section className="bg-blue-50 py-10 px-6">
-              <div className="max-w-6xl mx-auto">
-                <div
-                  className="
-        grid 
-        grid-cols-1 
-        sm:grid-cols-2 
-        lg:grid-cols-3 
-        gap-4 
-        md:gap-6 
-        place-items-stretch
-      "
-                >
-                  {myCourses.slice(0, 3).map((c) => (
-                    <CourseProgressCard
-                      key={c._id}
-                      course={c}
-                      userId={user?.id}
-                    />
-                  ))}
-                </div>
-              </div>
-            </section>
-          </div>
-        </section>
-      )}
-      {/* ===== KHOÁ HỌC CỦA BẠN ===== */}
-      {isAuthenticated && (
-        <section className="py-8 px-6 bg-slate-50">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-xl font-semibold mb-4 text-left">
-              Khoá học của bạn
+            <h2 className="text-xl font-semibold mb-6 text-left">
+              Chào mừng trở lại, sẵn sàng cho bài học tiếp theo?
             </h2>
 
-            {myCourses.length === 0 ? (
-              <p className="text-gray-500">Bạn chưa mua khoá học nào.</p>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                {myCourses.map((c) => (
-                  <CourseCard key={c._id} c={transformCourse(c)} />
-                ))}
-              </div>
-            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {myCourses.slice(0, 3).map((c) => (
+                <CourseProgressCard key={c._id} course={c} userId={user.id} />
+              ))}
+            </div>
           </div>
         </section>
       )}
-
-      {/* ==== FILTER DANH SÁCH ĐÃ MUA RA ===== */}
-      {(() => {
-        const purchasedIds = new Set(myCourses.map((c) => c._id));
-        var filteredRecommend = recommendCourses.filter(
-          (c) => !purchasedIds.has(c._id)
-        );
-        var filteredAllCourses = allCourses.filter(
-          (c) => !purchasedIds.has(c._id)
-        );
-      })()}
-
-      {/* ===== GỢI Ý CHO BẠN ===== */}
+      {/* ===== Danh mục khóa học ===== */}
       <section className="py-8 px-6">
         <div className="max-w-6xl mx-auto">
-          {/* ===== Danh mục khóa học ===== */}
-          <section className="py-8 px-6">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-xl font-semibold text-gray-800 mb-8">
-                Chọn khóa học yêu thích từ danh mục nổi bật
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                {categories.map((cat) => (
-                  <div
-                    key={cat.id}
-                    className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center text-center hover:shadow-lg transition"
-                  >
-                    <div className={`p-3 rounded-lg ${cat.color} mb-4`}>
-                      <cat.icon className="w-6 h-6" />
-                    </div>
-                    <h3 className="font-semibold text-gray-700 mb-2">
-                      {cat.name}
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-          <h2 className="text-xl font-semibold text-gray-800 mb-4 text-left">
-            Gợi ý cho bạn
+          <h2 className="text-xl font-semibold text-gray-800 mb-8 ">
+            Chọn khóa học yêu thích từ danh mục nổi bật
           </h2>
-
-          {loadingRecommend ? (
-            <p className="text-gray-500 py-6">Đang tải khoá học gợi ý...</p>
-          ) : filteredRecommend.length === 0 ? (
-            <p className="text-gray-500 py-6">Không có gợi ý phù hợp.</p>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-              {filteredRecommend.map((course) => {
-                const c = transformCourse(course);
-                return <CourseCard key={c.id} c={c} />;
-              })}
-            </div>
-          )}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {categories.map((cat) => (
+              <div
+                key={cat.id}
+                className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center text-center hover:shadow-lg transition"
+              >
+                <div className={`p-3 rounded-lg ${cat.color} mb-4`}>
+                  <cat.icon className="w-6 h-6" />
+                </div>
+                <h3 className="font-semibold text-gray-700 mb-2">{cat.name}</h3>
+                <p className="text-sm text-gray-500">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
+      {/* GỢI Ý CHO BẠN */}
+      <section className="py-8 px-6 max-w-6xl mx-auto">
+        <h2 className="text-xl font-semibold mb-4 text-left">Gợi ý cho bạn</h2>
 
-      {/* ===== TẤT CẢ KHOÁ HỌC ===== */}
-      <section className="bg-blue-50 py-12 px-6">
+        {loadingRecommend ? (
+          <p>Đang tải...</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {recommendCourses.map((c) => (
+              <CourseCard key={c._id} c={c} />
+            ))}
+          </div>
+        )}
+      </section>
+      {/* // ===== TẤT CẢ KHÓA HỌC ===== */}
+      <section className="bg-blue-50 py-10 px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-xl font-semibold text-gray-800 text-left">
-            Tất cả khoá học
-          </h2>
-          <p className="text-sm text-gray-500 text-left">
-            Tìm thấy {filteredAllCourses.length} khoá học phù hợp.
-          </p>
+          <h2 className="text-xl font-semibold text-left ">Tất cả khóa học</h2>
 
-          {loading ? (
-            <p className="text-center text-gray-500 py-10">
-              Đang tải dữ liệu...
-            </p>
-          ) : error ? (
-            <p className="text-center text-red-500 py-10">{error}</p>
-          ) : filteredAllCourses.length === 0 ? (
-            <p className="text-center text-gray-500 py-10">
-              Không còn khoá học nào khác.
-            </p>
-          ) : (
-            <>
+          <div className="relative min-h-[400px]">
+            {/* Overlay loading */}
+            {loading && (
+              <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center z-20">
+                <div className="w-8 h-8 border-4 border-gray-300 border-t-slate-900 rounded-full animate-spin"></div>
+              </div>
+            )}
+
+            {/* Nội dung khóa học */}
+            <div
+              className={`${loading ? "opacity-50 pointer-events-none" : ""}`}
+            >
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                {filteredAllCourses.map((course) => {
-                  const c = transformCourse(course);
-                  return <CourseCard key={c.id} c={c} />;
-                })}
+                {allCourses.map((c) => (
+                  <CourseCard key={c._id} c={c} />
+                ))}
               </div>
 
-              {/* PAGINATION GIỮ NGUYÊN */}
-            </>
-          )}
+              {/* ==== PAGINATION ==== */}
+              <div className="flex justify-center items-center mt-8 gap-2">
+                {/* Prev */}
+                <button
+                  disabled={page === 1}
+                  onClick={() => setPage((p) => p - 1)}
+                  className={`px-3 py-1 rounded ${
+                    page === 1 ? "bg-gray-200 text-gray-400" : "bg-white shadow"
+                  }`}
+                >
+                  Trước
+                </button>
+
+                {/* Page Buttons */}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (num) => (
+                    <button
+                      key={num}
+                      onClick={() => setPage(num)}
+                      className={`px-3 py-1 rounded ${
+                        page === num
+                          ? "bg-slate-900 text-white"
+                          : "bg-white shadow"
+                      }`}
+                    >
+                      {num}
+                    </button>
+                  )
+                )}
+
+                {/* Next */}
+                <button
+                  disabled={page === totalPages}
+                  onClick={() => setPage((p) => p + 1)}
+                  className={`px-3 py-1 rounded ${
+                    page === totalPages
+                      ? "bg-gray-200 text-gray-400"
+                      : "bg-white shadow"
+                  }`}
+                >
+                  Sau
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </div>

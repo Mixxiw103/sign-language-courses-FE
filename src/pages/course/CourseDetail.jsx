@@ -291,9 +291,7 @@ export default function CourseDetail() {
                 </div>
 
                 <div className="flex-1 leading-7 text-slate-700 text-left">
-                  <div
-                    dangerouslySetInnerHTML={{ __html: course.description }}
-                  />
+                  <div dangerouslySetInnerHTML={{ __html: course.content }} />
                 </div>
               </div>
 

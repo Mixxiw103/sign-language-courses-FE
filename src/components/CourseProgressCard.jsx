@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { api, URL_BASE } from "../utils/api";
+import { useNavigate } from "react-router-dom";
 
 export default function CourseProgressCard({ course, userId }) {
+  const navigate = useNavigate();
   const [progress, setProgress] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -24,10 +26,14 @@ export default function CourseProgressCard({ course, userId }) {
     fetchProgress();
   }, [userId, course?._id]);
 
+  // --- TÍNH TIẾN TRÌNH CHUẨN ---
   const totalLessons = progress?.totalLessons || 0;
   const completed = progress?.byStatus?.completed || 0;
-  const percent = progress?.avg_progress || 0;
 
+  const percent =
+    totalLessons > 0 ? Math.round((completed / totalLessons) * 100) : 0; // Tính chuẩn, không dùng avg_progress bị sai
+
+  // --- UI INFO ---
   const thumbnail =
     course.thumbnail_url ||
     "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200";
@@ -40,7 +46,11 @@ export default function CourseProgressCard({ course, userId }) {
     "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400";
 
   return (
-    <div className="rounded-xl bg-white shadow-sm hover:shadow-md overflow-hidden transition border border-gray-100">
+    <div
+      onClick={() => navigate(`/course/${course._id}`)}
+      className="rounded-xl bg-white shadow-sm hover:shadow-md overflow-hidden 
+                 transition border border-gray-100 cursor-pointer"
+    >
       {/* Image */}
       <img
         src={thumbnail.startsWith("http") ? thumbnail : URL_BASE + thumbnail}
