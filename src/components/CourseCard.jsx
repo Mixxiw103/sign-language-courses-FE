@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { URL_BASE } from "../utils/api";
-import { Edit } from "lucide-react"; // Import icon bút chì
+import { Edit } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 
 function Badge({ children }) {
@@ -12,21 +12,18 @@ function Badge({ children }) {
 }
 
 export default function CourseCard({ c }) {
-  const { user } = useAuth(); // 2. Lấy user hiện tại
+  const { user } = useAuth();
   const navigate = useNavigate();
 
-  // 3. Logic kiểm tra quyền sở hữu
-  // c.lecturer_id có thể là string ID hoặc object (nếu đã populate)
-  const lecturerId = c.lecturer_id?._id || c.lecturer_id?.id || c.lecturer_id;
+  const lecturerId = c.lecturer_id?._id || c.lecturer_id;
   const isOwner = user && user.id === lecturerId;
 
   const handleEdit = (e) => {
-    e.preventDefault(); // Ngăn Link cha hoạt động (không vào trang detail)
+    e.preventDefault();
     e.stopPropagation();
-    // Điều hướng sang trang sửa (bạn sửa đường dẫn này theo router của bạn)
     navigate(`/teacher/courses/edit/${c._id || c.id}`);
   };
-  //  Chuyển html
+
   function stripHtml(html) {
     if (!html) return "";
     return html.replace(/<[^>]+>/g, "");
@@ -35,24 +32,24 @@ export default function CourseCard({ c }) {
   return (
     <Link
       to={`/courses/${c.id || c._id}`}
-      className="block cursor-pointer text-left group rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-100 transition hover:shadow-md relative" // Thêm relative để nút Edit định vị
+      className="group rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-100 transition hover:shadow-md relative flex flex-col h-full"
     >
+      {/* IMAGE */}
       <div className="relative overflow-hidden rounded-xl">
         <img
           src={
             c.thumbnail_url
               ? URL_BASE + c.thumbnail_url
-              : "https://i.redd.it/i-got-bored-so-i-decided-to-draw-a-random-image-on-the-v0-4ig97vv85vjb1.png?width=1280&format=png&auto=webp&s=7177756d1f393b6e093596d06e1ba539f723264b"
+              : "https://i.redd.it/i-got-bored-so-i-decided-to-draw-a-random-image-on-the-v0-4ig97vv85vjb1.png"
           }
           alt={c.title}
           className="h-44 w-full object-cover transition group-hover:scale-[1.04]"
         />
 
-        {/* --- NÚT SỬA (CHỈ HIỆN KHI LÀ CHỦ SỞ HỮU) --- */}
         {isOwner && (
           <button
             onClick={handleEdit}
-            className="absolute cursor-pointer top-2 right-2 z-10 p-2 rounded-full bg-white/90 text-slate-600 shadow-sm hover:bg-orange-500 hover:text-white transition-colors"
+            className="absolute top-2 right-2 z-10 p-2 rounded-full bg-white/90 text-slate-600 shadow-sm hover:bg-orange-500 hover:text-white transition"
             title="Chỉnh sửa khóa học này"
           >
             <Edit size={16} />
@@ -60,65 +57,27 @@ export default function CourseCard({ c }) {
         )}
       </div>
 
-      <div className="space-y-3 p-2">
+      {/* CONTENT */}
+      <div className="flex flex-col justify-between flex-1 p-2">
+        {/* Tags */}
         <div className="flex items-center gap-2 text-xs text-slate-500">
-          <Badge>
-            {/* ... SVG giữ nguyên ... */}
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              className="-ml-0.5"
-            >
-              <rect
-                x="4"
-                y="4"
-                width="16"
-                height="16"
-                rx="2"
-                stroke="currentColor"
-                strokeWidth="1.6"
-              />
-            </svg>
-            {c.category || "Khóa học"}
-          </Badge>
-          <Badge>
-            {/* ... SVG giữ nguyên ... */}
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              className="-ml-0.5"
-            >
-              <path
-                d="M12 8v4l3 2"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <circle
-                cx="12"
-                cy="12"
-                r="9"
-                stroke="currentColor"
-                strokeWidth="1.6"
-              />
-            </svg>
-            {c.duration || "3 tháng"}
-          </Badge>
+          <Badge>{c.category || "Khóa học"}</Badge>
+          <Badge>{c.duration || "3 tháng"}</Badge>
         </div>
 
-        <h3 className="line-clamp-2 text-base font-semibold text-slate-600 group-hover:text-slate-950 transition">
+        {/* TITLE (ép cao 2 dòng) */}
+        <h3 className="text-left line-clamp-2 text-base font-semibold text-slate-600 group-hover:text-slate-950 transition min-h-[48px]">
           {c.title}
         </h3>
-        <p className="line-clamp-2 text-sm leading-6 text-slate-500">
+
+        {/* DESCRIPTION (ép cao 2 dòng) */}
+        <p className="text-left line-clamp-2 text-sm leading-6 text-slate-500 min-h-[48px]">
           {stripHtml(c.description)}
         </p>
 
-        <div className="flex items-center justify-between pt-1">
+        {/* Footer */}
+        <div className="flex items-center justify-between mt-2 pt-1">
+          {/* Lecturer */}
           <div className="flex items-center gap-2">
             <img
               src={
@@ -133,6 +92,8 @@ export default function CourseCard({ c }) {
               {c?.lecturer_id?.full_name || "Giảng viên"}
             </span>
           </div>
+
+          {/* Price */}
           <div className="text-right">
             {c.oldPrice && (
               <div className="text-[11px] text-slate-400 line-through">

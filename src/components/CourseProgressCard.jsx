@@ -61,7 +61,7 @@ export default function CourseProgressCard({ course, userId }) {
       {/* Content */}
       <div className="p-4">
         {/* Title */}
-        <h3 className="font-semibold text-gray-800 text-[15px] leading-tight line-clamp-2">
+        <h3 className="font-semibold text-gray-800 text-[15px] leading-tight line-clamp-2 text-left">
           {course.title}
         </h3>
 

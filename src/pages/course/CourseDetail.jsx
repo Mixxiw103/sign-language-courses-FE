@@ -47,7 +47,11 @@ export default function CourseDetail() {
 
         // 2) Check mua hay chưa
         let purchased = false;
-        if (userId) {
+
+        // Nếu admin hoặc lecturer → auto purchased
+        if (user?.role === "admin" || user?.role === "lecturer") {
+          purchased = true;
+        } else if (userId) {
           try {
             const check = await api.get(`/api/purchases/check?courseId=${id}`);
             purchased = check.data.isPurchased;
@@ -73,6 +77,7 @@ export default function CourseDetail() {
             title: l.title,
             video_url: l.video_url,
             durationMin: l.duration_min || 10,
+            content: l.content,
             documents: l.documents || [],
             description: l.description || "",
             progress: l.progress || {
@@ -198,7 +203,7 @@ export default function CourseDetail() {
               <Meta icon={Star} number={course.rating || 4.5} label="Ratings" />
               <Meta
                 icon={Clock}
-                number={course.totalDuration || "0h"}
+                number={course.totalDuration || "60 phút"}
                 label="Tổng thời lượng:"
               />
               <Meta
@@ -366,7 +371,7 @@ export default function CourseDetail() {
           </>
         )}
 
-        {/* ===================== CHẾ ĐỘ XEM BÀI HỌC (LESSON) ===================== */}
+        {/*  CHẾ ĐỘ XEM BÀI HỌC (LESSON)  */}
         {activeLesson && (
           <div className="w-full">
             {/* TIÊU ĐỀ BÀI HỌC */}
@@ -397,7 +402,7 @@ export default function CourseDetail() {
               <h2 className="text-xl font-semibold text-slate-900 mb-2 text-left">
                 Mô tả bài học:
               </h2>
-              <p className="text-slate-700 leading-7 whitespace-pre-line">
+              <p className="text-slate-700 leading-7 whitespace-pre-line text-left">
                 {activeLesson.content || "Chưa có mô tả cho bài học này."}
               </p>
             </div>
@@ -474,7 +479,7 @@ export default function CourseDetail() {
           activeLessonId={activeLesson?.id}
           isPurchased={isPurchased}
           onSelectLesson={async (lesson) => {
-            if (!isPurchased) {
+            if (!isPurchased && user?.role === "student") {
               toast.error("Bạn cần mua khoá học để xem bài học.");
               return;
             }
