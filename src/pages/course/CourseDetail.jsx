@@ -35,56 +35,68 @@ export default function CourseDetail() {
   // Tiến trình khoá học
   const [courseProgress, setCourseProgress] = useState(null);
 
-  /* -------------------- LOAD COURSE + TREE -------------------- */
+  /* -------------------- LOAD COURSE + LESSON + PROGRESS -------------------- */
   useEffect(() => {
-    const fetchData = async () => {
+    const loadFullData = async () => {
       try {
         setLoading(true);
 
-        // 1) Lấy info khóa học + tree
+        // 1) Load course + chương
         const res = await api.get(`/api/courses/${id}/tree`);
-        const data = res.data;
+        const courseData = res.data;
 
+        // 2) Check mua hay chưa
         let purchased = false;
-
-        // 2) Check đã mua (nếu login)
         if (userId) {
           try {
             const check = await api.get(`/api/purchases/check?courseId=${id}`);
             purchased = check.data.isPurchased;
-          } catch (e) {
-            console.log("Không check purchase được");
-          }
+          } catch (e) {}
         }
 
+        setCourse(courseData);
         setIsPurchased(purchased);
-        setCourse(data);
 
-        // 3) Map data chapters -> sections + lessons
-        const formattedSections = (data.chapters || []).map((ch) => ({
-          id: ch._id,
-          title: ch.title,
-          lessons: (ch.lessons || []).map((l) => ({
+        // 3) LOAD PROGRESS CHÍNH XÁC CHO TỪNG CHAPTER
+        const chapterList = courseData.chapters || [];
+        const newSections = [];
+
+        for (const chapter of chapterList) {
+          // API load lesson kèm progress
+          const lessonRes = await api.get(
+            `/api/progress/lessons?userId=${userId}&chapterId=${chapter._id}`
+          );
+
+          const lessons = (lessonRes.data || []).map((l) => ({
             id: l._id,
-            chapter_id: ch._id, // 🔥 THÊM CHAPTER_ID CHO MỖI LESSON
+            chapter_id: chapter._id,
             title: l.title,
+            video_url: l.video_url,
             durationMin: l.duration_min || 10,
-            status: purchased ? "unlocked" : "locked",
             documents: l.documents || [],
             description: l.description || "",
-            video_url: l.video_url || "",
-          })),
-        }));
+            progress: l.progress || {
+              status: "not_started",
+              progress_percent: 0,
+            },
+          }));
 
-        setSections(formattedSections);
+          newSections.push({
+            id: chapter._id,
+            title: chapter.title,
+            lessons,
+          });
+        }
+
+        setSections(newSections);
       } catch (err) {
-        console.error("Lỗi khi tải khóa học:", err);
+        console.error("Lỗi tải khóa học:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
+    loadFullData();
   }, [id, userId]);
 
   /* -------------------- LOAD TIẾN TRÌNH KHÓA HỌC -------------------- */
@@ -147,7 +159,7 @@ export default function CourseDetail() {
         lesson_id: activeLesson.id,
       });
 
-      toast.success("🎉 Bạn đã hoàn thành bài học!");
+      toast.success(" Bạn đã hoàn thành bài học!");
 
       // Reload tiến trình khóa học sau khi hoàn thành
       try {
@@ -291,7 +303,9 @@ export default function CourseDetail() {
                 </div>
 
                 <div className="flex-1 leading-7 text-slate-700 text-left">
-                  <div dangerouslySetInnerHTML={{ __html: course.content }} />
+                  <div
+                    dangerouslySetInnerHTML={{ __html: course.description }}
+                  />
                 </div>
               </div>
 
@@ -384,40 +398,9 @@ export default function CourseDetail() {
                 Mô tả bài học:
               </h2>
               <p className="text-slate-700 leading-7 whitespace-pre-line">
-                {activeLesson.description || "Chưa có mô tả cho bài học này."}
+                {activeLesson.content || "Chưa có mô tả cho bài học này."}
               </p>
             </div>
-            {/* TIẾN TRÌNH KHÓA HỌC */}
-            {courseProgress && (
-              <div className="py-8 border-t border-slate-200">
-                <h2 className="text-xl font-semibold text-slate-900 mb-3 text-left">
-                  Tiến trình khóa học
-                </h2>
-
-                <p className="text-slate-700 text-sm mb-2">
-                  Hoàn thành:{" "}
-                  <span className="font-bold text-slate-900">
-                    {courseProgress.byStatus?.completed || 0} /{" "}
-                    {courseProgress.totalLessons}
-                  </span>{" "}
-                  bài học
-                </p>
-
-                <div className="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
-                  <div
-                    className="bg-blue-600 h-3 rounded-full transition-all duration-500"
-                    style={{ width: `${courseProgress.avg_progress}%` }}
-                  />
-                </div>
-
-                {/* <p className="text-sm text-slate-600 mt-2">
-                  Tiến độ trung bình:{" "}
-                  <span className="font-semibold text-blue-700">
-                    {courseProgress.avg_progress}%
-                  </span>
-                </p> */}
-              </div>
-            )}
 
             {/* TÀI LIỆU ĐÍNH KÈM */}
             {activeLesson.documents?.length > 0 && (

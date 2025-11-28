@@ -47,7 +47,7 @@ export default function CourseProgressCard({ course, userId }) {
 
   return (
     <div
-      onClick={() => navigate(`/course/${course._id}`)}
+      onClick={() => navigate(`/courses/${course._id}`)}
       className="rounded-xl bg-white shadow-sm hover:shadow-md overflow-hidden 
                  transition border border-gray-100 cursor-pointer"
     >

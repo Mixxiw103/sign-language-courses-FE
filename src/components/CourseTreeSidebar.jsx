@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Lock, Play } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Lock,
+  CheckCircle,
+  Circle,
+  CircleDot,
+} from "lucide-react";
 
 export default function CourseTreeSidebar({
   sections = [],
@@ -7,7 +14,6 @@ export default function CourseTreeSidebar({
   onSelectLesson = () => {},
   isPurchased = false,
 }) {
-  // mở chapter mặc định: mở tất cả
   const [openChapters, setOpenChapters] = useState(
     new Set(sections.map((s) => s.id))
   );
@@ -34,7 +40,7 @@ export default function CourseTreeSidebar({
 
           return (
             <div key={sec.id} className="px-3 py-2">
-              {/* CHAPTER TITLE */}
+              {/* CHAPTER HEADER */}
               <button
                 onClick={() => toggleChapter(sec.id)}
                 className="w-full flex items-center justify-between py-2"
@@ -50,12 +56,12 @@ export default function CourseTreeSidebar({
                 )}
               </button>
 
-              {/* LESSON LIST */}
+              {/* LESSONS */}
               {isOpen && (
                 <div className="mt-1">
                   {sec.lessons.map((l) => {
-                    const locked = !isPurchased;
                     const isActive = activeLessonId === l.id;
+                    const locked = !isPurchased;
 
                     return (
                       <button
@@ -83,11 +89,15 @@ export default function CourseTreeSidebar({
                           </div>
                         </div>
 
-                        {/* RIGHT ICON */}
+                        {/* STATUS ICON */}
                         {locked ? (
                           <Lock className="w-4 h-4 text-slate-400" />
+                        ) : l.progress?.status === "completed" ? (
+                          <CheckCircle className="w-4 h-4 text-green-600" />
+                        ) : l.progress?.status === "in_progress" ? (
+                          <CircleDot className="w-4 h-4 text-blue-500" />
                         ) : (
-                          <Play className="w-4 h-4 text-indigo-600" />
+                          <Circle className="w-4 h-4 text-slate-400" />
                         )}
                       </button>
                     );
