@@ -271,27 +271,6 @@ export default function CoursePage() {
           Search
         </button>
       </div>
-      {/* ===== KHOÁ HỌC CỦA BẠN ===== */}
-      {isAuthenticated && (
-        <section className="py-8 px-6 bg-slate-50">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-xl font-semibold mb-4 text-left">
-              Khoá học của bạn
-            </h2>
-
-            {myCourses.length === 0 ? (
-              <p className="text-gray-500">Bạn chưa mua khoá học nào.</p>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                {myCourses.map((c) => (
-                  <CourseCard key={c._id} c={transformCourse(c)} />
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-      {/* ===== LỊCH SỬ TIẾN TRÌNH HỌC ===== */}
       {/* ===== BÀI HỌC TIẾP THEO (TIẾN TRÌNH KHOÁ HỌC) ===== */}
       {isAuthenticated && myCourses.length > 0 && (
         <section className="bg-blue-50 py-10 px-6">
@@ -328,6 +307,26 @@ export default function CoursePage() {
                 </div>
               </div>
             </section>
+          </div>
+        </section>
+      )}
+      {/* ===== KHOÁ HỌC CỦA BẠN ===== */}
+      {isAuthenticated && (
+        <section className="py-8 px-6 bg-slate-50">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-xl font-semibold mb-4 text-left">
+              Khoá học của bạn
+            </h2>
+
+            {myCourses.length === 0 ? (
+              <p className="text-gray-500">Bạn chưa mua khoá học nào.</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                {myCourses.map((c) => (
+                  <CourseCard key={c._id} c={transformCourse(c)} />
+                ))}
+              </div>
+            )}
           </div>
         </section>
       )}
