@@ -13,6 +13,7 @@ import CourseCard from "../../components/CourseCard";
 import { courseApi } from "../../utils/apis/courseService";
 import { useAuth } from "../../auth/AuthContext";
 import { api } from "../../utils/api";
+import CourseProgressCard from "../../components/CourseProgressCard";
 
 export default function CoursePage() {
   const { user, isAuthenticated } = useAuth();
@@ -41,6 +42,14 @@ export default function CoursePage() {
   const [loadingMine, setLoadingMine] = useState(false);
   const [loadingRecommend, setLoadingRecommend] = useState(false);
   const [error, setError] = useState(null);
+
+  //  Hiển thị tiến trình khoá học
+  async function getCourseProgress(courseId) {
+    const res = await api.get(
+      `/api/progress/${user._id}/course/${courseId}/summary`
+    );
+    return res.data;
+  }
 
   // ===== Helper chuẩn hoá khoá học để đẩy vào CourseCard =====
   function transformCourse(course) {
@@ -279,6 +288,46 @@ export default function CoursePage() {
                 ))}
               </div>
             )}
+          </div>
+        </section>
+      )}
+      {/* ===== LỊCH SỬ TIẾN TRÌNH HỌC ===== */}
+      {/* ===== BÀI HỌC TIẾP THEO (TIẾN TRÌNH KHOÁ HỌC) ===== */}
+      {isAuthenticated && myCourses.length > 0 && (
+        <section className="bg-blue-50 py-10 px-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-gray-800">
+                Chào mừng trở lại, sẵn sàng cho bài học tiếp theo?
+              </h2>
+              <button className="text-sm text-black hover:underline">
+                Xem tất cả
+              </button>
+            </div>
+
+            <section className="bg-blue-50 py-10 px-6">
+              <div className="max-w-6xl mx-auto">
+                <div
+                  className="
+        grid 
+        grid-cols-1 
+        sm:grid-cols-2 
+        lg:grid-cols-3 
+        gap-4 
+        md:gap-6 
+        place-items-stretch
+      "
+                >
+                  {myCourses.slice(0, 3).map((c) => (
+                    <CourseProgressCard
+                      key={c._id}
+                      course={c}
+                      userId={user?.id}
+                    />
+                  ))}
+                </div>
+              </div>
+            </section>
           </div>
         </section>
       )}
